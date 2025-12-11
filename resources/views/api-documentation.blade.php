@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +24,7 @@
             margin: 0 auto;
             background: white;
             border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
 
@@ -88,7 +89,7 @@
         }
 
         .accordion:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .accordion-header {
@@ -200,7 +201,7 @@
             font-size: 0.9em;
             line-height: 1.6;
             margin: 10px 0;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .code-block pre {
@@ -272,6 +273,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -282,10 +284,11 @@
         <div class="content">
             <div class="base-info">
                 <h3>Base URL</h3>
-                <code>{{ env('APP_URL') }}/api</code>
+                <code>{{ env('APP_URL', 'https://api.forum.gutsylab.com') }}/api</code>
 
                 <h3 style="margin-top: 20px;">Authentication</h3>
-                <p style="margin: 10px 0; color: #666;">This API uses Laravel Sanctum for authentication. After login/register, include the token in the header:</p>
+                <p style="margin: 10px 0; color: #666;">This API uses Laravel Sanctum for authentication. After
+                    login/register, include the token in the header:</p>
                 <code>Authorization: Bearer {your_token}</code>
             </div>
 
@@ -306,18 +309,21 @@
 
                         <div class="api-section">
                             <h4>Request Body:</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "name": "John Doe",
   "username": "johndoe",
   "email": "john@example.com",
   "password": "password123",
   "password_confirmation": "password123"
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
 
                         <div class="api-section">
                             <h4>Response (201):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "message": "User registered successfully",
   "data": {
@@ -329,7 +335,8 @@
     },
     "access_token": "1|abc123..."
   }
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -349,15 +356,18 @@
 
                         <div class="api-section">
                             <h4>Request Body:</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "email": "john@example.com",
   "password": "password123"
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
 
                         <div class="api-section">
                             <h4>Response (200):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "message": "Login successful",
   "data": {
@@ -369,7 +379,8 @@
     },
     "access_token": "2|xyz789..."
   }
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -390,15 +401,19 @@
 
                         <div class="api-section">
                             <h4>Headers:</h4>
-                            <div class="code-block"><pre>Authorization: Bearer {token}</pre></div>
+                            <div class="code-block">
+                                <pre>Authorization: Bearer {token}</pre>
+                            </div>
                         </div>
 
                         <div class="api-section">
                             <h4>Response (200):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "message": "Logout successful"
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -422,12 +437,15 @@
 
                         <div class="api-section">
                             <h4>Query Parameters:</h4>
-                            <div class="code-block"><pre>page (optional): Page number for pagination</pre></div>
+                            <div class="code-block">
+                                <pre>page (optional): Page number for pagination</pre>
+                            </div>
                         </div>
 
                         <div class="api-section">
                             <h4>Response (200):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "data": {
     "current_page": 1,
@@ -451,7 +469,8 @@
     "per_page": 20,
     "total": 50
   }
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -468,20 +487,24 @@
                 <div class="accordion-content">
                     <div class="accordion-body">
                         <div class="auth-required">Authentication Required</div>
-                        <p class="description">Create a new topic. Category will be created automatically if not exists.</p>
+                        <p class="description">Create a new topic. Category will be created automatically if not exists.
+                        </p>
 
                         <div class="api-section">
                             <h4>Request Body:</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "title": "Laravel Best Practices",
   "body": "What are the best practices when using Laravel?",
   "category_name": "Laravel"
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
 
                         <div class="api-section">
                             <h4>Response (201):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "message": "Topic created successfully",
   "data": {
@@ -491,7 +514,8 @@
     "user_id": 1,
     "topic_category_id": 1
   }
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -512,7 +536,8 @@
 
                         <div class="api-section">
                             <h4>Response (200):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "data": {
     "id": 1,
@@ -524,7 +549,8 @@
     "comments_count": 5,
     "likes_count": 10
   }
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -545,20 +571,24 @@
 
                         <div class="api-section">
                             <h4>Request Body:</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "title": "Updated Title",
   "body": "Updated body content",
   "category_name": "PHP"
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
 
                         <div class="api-section">
                             <h4>Response (200):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "message": "Topic updated successfully",
   "data": {...}
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -579,10 +609,12 @@
 
                         <div class="api-section">
                             <h4>Response (200):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "message": "Topic deleted successfully"
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -606,7 +638,8 @@
 
                         <div class="api-section">
                             <h4>Response (200):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "data": {
     "current_page": 1,
@@ -623,7 +656,8 @@
       }
     ]
   }
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -644,14 +678,17 @@
 
                         <div class="api-section">
                             <h4>Request Body:</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "body": "This is a great topic!"
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
 
                         <div class="api-section">
                             <h4>Response (201):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "message": "Comment created successfully",
   "data": {
@@ -660,7 +697,8 @@
     "body": "This is a great topic!",
     "user": {...}
   }
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -681,9 +719,11 @@
 
                         <div class="api-section">
                             <h4>Request Body:</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "body": "Updated comment text"
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -723,14 +763,16 @@
 
                         <div class="api-section">
                             <h4>Response (200):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "message": "Topic liked successfully",
   "data": {
     "liked": true,
     "likes_count": 11
   }
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -751,7 +793,8 @@
 
                         <div class="api-section">
                             <h4>Response (200):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "data": {
     "data": [
@@ -762,7 +805,8 @@
       }
     ]
   }
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -786,13 +830,17 @@
 
                         <div class="api-section">
                             <h4>Query Parameters:</h4>
-                            <div class="code-block"><pre>query (required): Search term
-page (optional): Page number</pre></div>
+                            <div class="code-block">
+                                <pre>query (required): Search term
+page (optional): Page number</pre>
+                            </div>
                         </div>
 
                         <div class="api-section">
                             <h4>Example:</h4>
-                            <div class="code-block"><pre>GET /users/search?query=john</pre></div>
+                            <div class="code-block">
+                                <pre>GET /users/search?query=john</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -813,7 +861,8 @@ page (optional): Page number</pre></div>
 
                         <div class="api-section">
                             <h4>Response (200):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "data": {
     "id": 1,
@@ -824,7 +873,8 @@ page (optional): Page number</pre></div>
     "following_count": 10,
     "is_following": false
   }
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -845,10 +895,12 @@ page (optional): Page number</pre></div>
 
                         <div class="api-section">
                             <h4>Response (200):</h4>
-                            <div class="code-block"><pre>{
+                            <div class="code-block">
+                                <pre>{
   "success": true,
   "message": "User followed successfully"
-}</pre></div>
+}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -906,7 +958,8 @@ page (optional): Page number</pre></div>
             <div class="note">
                 <h4>📌 Important Notes</h4>
                 <ul>
-                    <li>All endpoints requiring authentication must include <code>Authorization: Bearer {token}</code> header</li>
+                    <li>All endpoints requiring authentication must include <code>Authorization: Bearer {token}</code>
+                        header</li>
                     <li>Default pagination is 20 items per page</li>
                     <li>Only topic/comment owners can update or delete their content</li>
                     <li>Categories are automatically created when creating a topic</li>
@@ -951,4 +1004,5 @@ page (optional): Page number</pre></div>
         });
     </script>
 </body>
+
 </html>
