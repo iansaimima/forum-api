@@ -34,18 +34,20 @@ class TopicController extends Controller
 
             unset($topic->created_at, $topic->updated_at);
 
-            // lakukan juga pada $topics->user
-            $topic->user->created_at_formatted = date('d M Y, H:i', strtotime($topic->user->created_at));
-            $topic->user->updated_at_formatted = date('d M Y, H:i', strtotime($topic->user->updated_at));
+            if ($topic->user) {
+                // lakukan juga pada $topics->user
+                $topic->user->created_at_formatted = date('d M Y, H:i', strtotime($topic->user->created_at));
+                $topic->user->updated_at_formatted = date('d M Y, H:i', strtotime($topic->user->updated_at));
 
-            // human diff
-            $topic->user->created_at_ago = $topic->user->created_at->diffInMinutes(now()) < 5
-                ? 'just now'
-                : $topic->user->created_at->diffForHumans();
-            $topic->user->updated_at_ago = $topic->user->updated_at->diffInMinutes(now()) < 5
-                ? 'just now'
-                : $topic->user->updated_at->diffForHumans();
-            unset($topic->user->created_at, $topic->user->updated_at);
+                // human diff
+                $topic->user->created_at_ago = $topic->user->created_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $topic->user->created_at->diffForHumans();
+                $topic->user->updated_at_ago = $topic->user->updated_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $topic->user->updated_at->diffForHumans();
+                unset($topic->user->created_at, $topic->user->updated_at);
+            }
 
             // lakukan juga pada $topics->comments
             foreach ($topic->comments as $comment) {
