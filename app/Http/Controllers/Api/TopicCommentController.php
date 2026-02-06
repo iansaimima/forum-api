@@ -29,18 +29,26 @@ class TopicCommentController extends Controller
             ->paginate(20);
 
         $comments->getCollection()->transform(function ($comment) {
-            $comment->created_at_ago = $comment->created_at->diffInMinutes(now()) < 5
-                ? 'just now'
-                : $comment->created_at->diffForHumans();
-            $comment->updated_at_ago = $comment->updated_at->diffInMinutes(now()) < 5
-                ? 'just now'
-                : $comment->updated_at->diffForHumans();
+            if ($comment->created_at) {
+                $comment->created_at_ago = $comment->created_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $comment->created_at->diffForHumans();
+                $comment->created_at_formatted = date('d M Y, H:i', strtotime($comment->created_at));
+            }
 
-            $comment->created_at_formatted = date('d M Y, H:i', strtotime($comment->created_at));
-            $comment->updated_at_formatted = date('d M Y, H:i', strtotime($comment->updated_at));
+            if ($comment->updated_at) {
+                $comment->updated_at_ago = $comment->updated_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $comment->updated_at->diffForHumans();
+                $comment->updated_at_formatted = date('d M Y, H:i', strtotime($comment->updated_at));
+            }
 
             unset($comment->created_at, $comment->updated_at);
-            unset($comment->user->created_at, $comment->user->updated_at);
+
+            if ($comment->user) {
+                unset($comment->user->created_at, $comment->user->updated_at);
+            }
+
             return $comment;
         });
 
