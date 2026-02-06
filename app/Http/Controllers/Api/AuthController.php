@@ -52,11 +52,29 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        // Format timestamps
+        if ($user->created_at) {
+            $user->created_at_formatted = date('d M Y, H:i', strtotime($user->created_at));
+            $user->created_at_ago = $user->created_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $user->created_at->diffForHumans();
+        }
+
+        if ($user->updated_at) {
+            $user->updated_at_formatted = date('d M Y, H:i', strtotime($user->updated_at));
+            $user->updated_at_ago = $user->updated_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $user->updated_at->diffForHumans();
+        }
+
+        $userData = $user->toArray();
+        unset($userData['created_at'], $userData['updated_at']);
+
         return response()->json([
             'success' => true,
             'message' => 'User registered successfully',
             'data'    => [
-                'user'         => $user,
+                'user'         => $userData,
                 'access_token' => $token,
                 'token_type'   => 'Bearer',
             ],
@@ -103,11 +121,29 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        // Format timestamps
+        if ($user->created_at) {
+            $user->created_at_formatted = date('d M Y, H:i', strtotime($user->created_at));
+            $user->created_at_ago = $user->created_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $user->created_at->diffForHumans();
+        }
+
+        if ($user->updated_at) {
+            $user->updated_at_formatted = date('d M Y, H:i', strtotime($user->updated_at));
+            $user->updated_at_ago = $user->updated_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $user->updated_at->diffForHumans();
+        }
+
+        $userData = $user->toArray();
+        unset($userData['created_at'], $userData['updated_at']);
+
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
             'data'    => [
-                'user'         => $user,
+                'user'         => $userData,
                 'access_token' => $token,
                 'token_type'   => 'Bearer',
             ],
