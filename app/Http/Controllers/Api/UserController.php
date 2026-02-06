@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -15,18 +14,18 @@ class UserController extends Controller
     {
         $query = $request->input('query');
 
-        if (!$query) {
+        if (! $query) {
             return response()->json([
                 'success' => false,
-                'message' => 'Query parameter is required'
+                'message' => 'Query parameter is required',
             ], 422);
         }
 
-        $users = User::where(function($q) use ($query) {
-                $q->where('username', 'like', "%{$query}%")
-                  ->orWhere('email', 'like', "%{$query}%")
-                  ->orWhere('name', 'like', "%{$query}%");
-            })
+        $users = User::where(function ($q) use ($query) {
+            $q->where('username', 'like', "%{$query}%")
+                ->orWhere('email', 'like', "%{$query}%")
+                ->orWhere('name', 'like', "%{$query}%");
+        })
             ->where('id', '!=', auth()->id()) // Exclude current user
             ->select('id', 'name', 'username', 'email', 'created_at', 'updated_at')
             ->paginate(20);
@@ -34,14 +33,14 @@ class UserController extends Controller
         $users->getCollection()->transform(function ($user) {
             if ($user->created_at) {
                 $user->created_at_formatted = date('d M Y, H:i', strtotime($user->created_at));
-                $user->created_at_ago = $user->created_at->diffInMinutes(now()) < 5
+                $user->created_at_ago       = $user->created_at->diffInMinutes(now()) < 5
                     ? 'just now'
                     : $user->created_at->diffForHumans();
             }
 
             if ($user->updated_at) {
                 $user->updated_at_formatted = date('d M Y, H:i', strtotime($user->updated_at));
-                $user->updated_at_ago = $user->updated_at->diffInMinutes(now()) < 5
+                $user->updated_at_ago       = $user->updated_at->diffInMinutes(now()) < 5
                     ? 'just now'
                     : $user->updated_at->diffForHumans();
             }
@@ -52,7 +51,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $users
+            'data'    => $users,
         ]);
     }
 
@@ -64,34 +63,37 @@ class UserController extends Controller
         $user = User::withCount(['topics', 'followers', 'following'])
             ->find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not found'
+                'message' => 'User not found',
             ], 404);
         }
 
         if ($user->created_at) {
             $user->created_at_formatted = date('d M Y, H:i', strtotime($user->created_at));
-            $user->created_at_ago = $user->created_at->diffInMinutes(now()) < 5
+            $user->created_at_ago       = $user->created_at->diffInMinutes(now()) < 5
                 ? 'just now'
                 : $user->created_at->diffForHumans();
         }
 
         if ($user->updated_at) {
             $user->updated_at_formatted = date('d M Y, H:i', strtotime($user->updated_at));
-            $user->updated_at_ago = $user->updated_at->diffInMinutes(now()) < 5
+            $user->updated_at_ago       = $user->updated_at->diffInMinutes(now()) < 5
                 ? 'just now'
                 : $user->updated_at->diffForHumans();
         }
 
-        $data = $user->toArray();
+        $data                 = $user->toArray();
         $data['is_following'] = auth()->user()->isFollowing($id);
         unset($data['created_at'], $data['updated_at']);
 
+        // tambahkan field is_you
+        $data['is_you'] = auth()->id() == $user->id;
+
         return response()->json([
             'success' => true,
-            'data' => $data
+            'data'    => $data,
         ]);
     }
 
@@ -103,16 +105,16 @@ class UserController extends Controller
         if ($id == auth()->id()) {
             return response()->json([
                 'success' => false,
-                'message' => 'You cannot follow yourself'
+                'message' => 'You cannot follow yourself',
             ], 422);
         }
 
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not found'
+                'message' => 'User not found',
             ], 404);
         }
 
@@ -121,7 +123,7 @@ class UserController extends Controller
         if ($currentUser->isFollowing($id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'You are already following this user'
+                'message' => 'You are already following this user',
             ], 422);
         }
 
@@ -129,7 +131,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'User followed successfully'
+            'message' => 'User followed successfully',
         ]);
     }
 
@@ -141,25 +143,25 @@ class UserController extends Controller
         if ($id == auth()->id()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid operation'
+                'message' => 'Invalid operation',
             ], 422);
         }
 
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not found'
+                'message' => 'User not found',
             ], 404);
         }
 
         $currentUser = auth()->user();
 
-        if (!$currentUser->isFollowing($id)) {
+        if (! $currentUser->isFollowing($id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'You are not following this user'
+                'message' => 'You are not following this user',
             ], 422);
         }
 
@@ -167,7 +169,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'User unfollowed successfully'
+            'message' => 'User unfollowed successfully',
         ]);
     }
 
@@ -178,10 +180,10 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not found'
+                'message' => 'User not found',
             ], 404);
         }
 
@@ -192,14 +194,14 @@ class UserController extends Controller
         $followers->getCollection()->transform(function ($follower) {
             if ($follower->created_at) {
                 $follower->created_at_formatted = date('d M Y, H:i', strtotime($follower->created_at));
-                $follower->created_at_ago = $follower->created_at->diffInMinutes(now()) < 5
+                $follower->created_at_ago       = $follower->created_at->diffInMinutes(now()) < 5
                     ? 'just now'
                     : $follower->created_at->diffForHumans();
             }
 
             if ($follower->updated_at) {
                 $follower->updated_at_formatted = date('d M Y, H:i', strtotime($follower->updated_at));
-                $follower->updated_at_ago = $follower->updated_at->diffInMinutes(now()) < 5
+                $follower->updated_at_ago       = $follower->updated_at->diffInMinutes(now()) < 5
                     ? 'just now'
                     : $follower->updated_at->diffForHumans();
             }
@@ -210,7 +212,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $followers
+            'data'    => $followers,
         ]);
     }
 
@@ -221,10 +223,10 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not found'
+                'message' => 'User not found',
             ], 404);
         }
 
@@ -235,14 +237,14 @@ class UserController extends Controller
         $following->getCollection()->transform(function ($user) {
             if ($user->created_at) {
                 $user->created_at_formatted = date('d M Y, H:i', strtotime($user->created_at));
-                $user->created_at_ago = $user->created_at->diffInMinutes(now()) < 5
+                $user->created_at_ago       = $user->created_at->diffInMinutes(now()) < 5
                     ? 'just now'
                     : $user->created_at->diffForHumans();
             }
 
             if ($user->updated_at) {
                 $user->updated_at_formatted = date('d M Y, H:i', strtotime($user->updated_at));
-                $user->updated_at_ago = $user->updated_at->diffInMinutes(now()) < 5
+                $user->updated_at_ago       = $user->updated_at->diffInMinutes(now()) < 5
                     ? 'just now'
                     : $user->updated_at->diffForHumans();
             }
@@ -253,7 +255,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $following
+            'data'    => $following,
         ]);
     }
 }
