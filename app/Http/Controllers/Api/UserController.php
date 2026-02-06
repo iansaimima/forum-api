@@ -28,8 +28,27 @@ class UserController extends Controller
                   ->orWhere('name', 'like', "%{$query}%");
             })
             ->where('id', '!=', auth()->id()) // Exclude current user
-            ->select('id', 'name', 'username', 'email', 'created_at')
+            ->select('id', 'name', 'username', 'email', 'created_at', 'updated_at')
             ->paginate(20);
+
+        $users->getCollection()->transform(function ($user) {
+            if ($user->created_at) {
+                $user->created_at_formatted = date('d M Y, H:i', strtotime($user->created_at));
+                $user->created_at_ago = $user->created_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $user->created_at->diffForHumans();
+            }
+
+            if ($user->updated_at) {
+                $user->updated_at_formatted = date('d M Y, H:i', strtotime($user->updated_at));
+                $user->updated_at_ago = $user->updated_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $user->updated_at->diffForHumans();
+            }
+
+            unset($user->created_at, $user->updated_at);
+            return $user;
+        });
 
         return response()->json([
             'success' => true,
@@ -52,8 +71,23 @@ class UserController extends Controller
             ], 404);
         }
 
+        if ($user->created_at) {
+            $user->created_at_formatted = date('d M Y, H:i', strtotime($user->created_at));
+            $user->created_at_ago = $user->created_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $user->created_at->diffForHumans();
+        }
+
+        if ($user->updated_at) {
+            $user->updated_at_formatted = date('d M Y, H:i', strtotime($user->updated_at));
+            $user->updated_at_ago = $user->updated_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $user->updated_at->diffForHumans();
+        }
+
         $data = $user->toArray();
         $data['is_following'] = auth()->user()->isFollowing($id);
+        unset($data['created_at'], $data['updated_at']);
 
         return response()->json([
             'success' => true,
@@ -152,8 +186,27 @@ class UserController extends Controller
         }
 
         $followers = $user->followers()
-            ->select('users.id', 'users.name', 'users.username', 'users.email')
+            ->select('users.id', 'users.name', 'users.username', 'users.email', 'users.created_at', 'users.updated_at')
             ->paginate(20);
+
+        $followers->getCollection()->transform(function ($follower) {
+            if ($follower->created_at) {
+                $follower->created_at_formatted = date('d M Y, H:i', strtotime($follower->created_at));
+                $follower->created_at_ago = $follower->created_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $follower->created_at->diffForHumans();
+            }
+
+            if ($follower->updated_at) {
+                $follower->updated_at_formatted = date('d M Y, H:i', strtotime($follower->updated_at));
+                $follower->updated_at_ago = $follower->updated_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $follower->updated_at->diffForHumans();
+            }
+
+            unset($follower->created_at, $follower->updated_at, $follower->pivot);
+            return $follower;
+        });
 
         return response()->json([
             'success' => true,
@@ -176,8 +229,27 @@ class UserController extends Controller
         }
 
         $following = $user->following()
-            ->select('users.id', 'users.name', 'users.username', 'users.email')
+            ->select('users.id', 'users.name', 'users.username', 'users.email', 'users.created_at', 'users.updated_at')
             ->paginate(20);
+
+        $following->getCollection()->transform(function ($user) {
+            if ($user->created_at) {
+                $user->created_at_formatted = date('d M Y, H:i', strtotime($user->created_at));
+                $user->created_at_ago = $user->created_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $user->created_at->diffForHumans();
+            }
+
+            if ($user->updated_at) {
+                $user->updated_at_formatted = date('d M Y, H:i', strtotime($user->updated_at));
+                $user->updated_at_ago = $user->updated_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $user->updated_at->diffForHumans();
+            }
+
+            unset($user->created_at, $user->updated_at, $user->pivot);
+            return $user;
+        });
 
         return response()->json([
             'success' => true,
