@@ -36,10 +36,10 @@ class TopicController extends Controller
 
             if ($topic->user) {
                 // lakukan juga pada $topics->user
-                // $topic->user->created_at_formatted = date('d M Y, H:i', strtotime($topic->user->created_at));
-                // $topic->user->updated_at_formatted = date('d M Y, H:i', strtotime($topic->user->updated_at));
+                $topic->user->created_at_formatted = date('d M Y, H:i', strtotime($topic->user->created_at));
+                $topic->user->updated_at_formatted = date('d M Y, H:i', strtotime($topic->user->updated_at));
 
-                // // human diff
+                // human diff
                 // $topic->user->created_at_ago = $topic->user->created_at->diffInMinutes(now()) < 5
                 //     ? 'just now'
                 //     : $topic->user->created_at->diffForHumans();
