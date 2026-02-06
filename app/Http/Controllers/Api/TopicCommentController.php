@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -17,21 +16,37 @@ class TopicCommentController extends Controller
     {
         $topic = Topic::find($topicId);
 
-        if (!$topic) {
+        if (! $topic) {
             return response()->json([
                 'success' => false,
-                'message' => 'Topic not found'
+                'message' => 'Topic not found',
             ], 404);
         }
 
         $comments = TopicComment::where('topic_id', $topicId)
-            ->with('user')
+            ->with('user:id,name,email,username')
             ->latest()
             ->paginate(20);
 
+        $comments->getCollection()->transform(function ($comment) {
+            $comment->created_at_ago = $comment->created_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $comment->created_at->diffForHumans();
+            $comment->updated_at_ago = $comment->updated_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $comment->updated_at->diffForHumans();
+
+            $comment->created_at_formatted = date('d M Y, H:i', strtotime($comment->created_at));
+            $comment->updated_at_formatted = date('d M Y, H:i', strtotime($comment->updated_at));
+
+            unset($comment->created_at, $comment->updated_at);
+            unset($comment->user->created_at, $comment->user->updated_at);
+            return $comment;
+        });
+
         return response()->json([
             'success' => true,
-            'data' => $comments
+            'data'    => $comments,
         ]);
     }
 
@@ -42,10 +57,10 @@ class TopicCommentController extends Controller
     {
         $topic = Topic::find($topicId);
 
-        if (!$topic) {
+        if (! $topic) {
             return response()->json([
                 'success' => false,
-                'message' => 'Topic not found'
+                'message' => 'Topic not found',
             ], 404);
         }
 
@@ -57,14 +72,14 @@ class TopicCommentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
+                'errors'  => $validator->errors(),
+            ], 200);
         }
 
         $comment = TopicComment::create([
             'topic_id' => $topicId,
-            'user_id' => auth()->id(),
-            'body' => $request->body,
+            'user_id'  => auth()->id(),
+            'body'     => $request->body,
         ]);
 
         $comment->load('user');
@@ -72,7 +87,7 @@ class TopicCommentController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Comment created successfully',
-            'data' => $comment
+            'data'    => $comment,
         ], 201);
     }
 
@@ -83,10 +98,10 @@ class TopicCommentController extends Controller
     {
         $comment = TopicComment::where('topic_id', $topicId)->find($commentId);
 
-        if (!$comment) {
+        if (! $comment) {
             return response()->json([
                 'success' => false,
-                'message' => 'Comment not found'
+                'message' => 'Comment not found',
             ], 404);
         }
 
@@ -94,7 +109,7 @@ class TopicCommentController extends Controller
         if ($comment->user_id !== auth()->id()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized to update this comment'
+                'message' => 'Unauthorized to update this comment',
             ], 403);
         }
 
@@ -106,8 +121,8 @@ class TopicCommentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
+                'errors'  => $validator->errors(),
+            ], 200);
         }
 
         $comment->body = $request->body;
@@ -117,7 +132,7 @@ class TopicCommentController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Comment updated successfully',
-            'data' => $comment
+            'data'    => $comment,
         ]);
     }
 
@@ -128,10 +143,10 @@ class TopicCommentController extends Controller
     {
         $comment = TopicComment::where('topic_id', $topicId)->find($commentId);
 
-        if (!$comment) {
+        if (! $comment) {
             return response()->json([
                 'success' => false,
-                'message' => 'Comment not found'
+                'message' => 'Comment not found',
             ], 404);
         }
 
@@ -139,7 +154,7 @@ class TopicCommentController extends Controller
         if ($comment->user_id !== auth()->id()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized to delete this comment'
+                'message' => 'Unauthorized to delete this comment',
             ], 403);
         }
 
@@ -147,7 +162,7 @@ class TopicCommentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Comment deleted successfully'
+            'message' => 'Comment deleted successfully',
         ]);
     }
 }

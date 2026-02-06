@@ -1,13 +1,12 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -17,33 +16,49 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $validator = Validator::make($request->all(), [
+            'name'     => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
+            'phone'    => 'nullable|string|max:20',
+            'address'  => 'nullable|string',
+        ], [
+            'name.required'     => 'Name is required.',
+            'username.required' => 'Username is required.',
+            'username.unique'   => 'The username has already been taken.',
+            'email.required'    => 'Email is required.',
+            'email.unique'      => 'The email has already been taken.',
+            'password.required' => 'Password is required.',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Registration validation failed',
+                'errors'  => $validator->errors(),
+            ], 200); // Custom status code 200
+        }
+        $validated = $validator->validated();
+
         $user = User::create([
-            'name' => $validated['name'],
+            'name'     => $validated['name'],
             'username' => $validated['username'],
-            'email' => $validated['email'],
+            'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'phone' => $validated['phone'] ?? null,
-            'address' => $validated['address'] ?? null,
+            'phone'    => $validated['phone'] ?? null,
+            'address'  => $validated['address'] ?? null,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'success' => true,
-            'message' => 'user registered successfully',
-            'data' => [
-                'user' => $user,
+            'message' => 'User registered successfully',
+            'data'    => [
+                'user'         => $user,
                 'access_token' => $token,
-                'token_type' => 'Bearer',
+                'token_type'   => 'Bearer',
             ],
         ], 201);
     }
@@ -53,17 +68,37 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
+        // Cara 2: Validation dengan custom status code menggunakan Validator facade
+        $validator = Validator::make($request->all(), [
+            'email'    => 'required|email',
             'password' => 'required',
+        ], [
+            'email.required'    => 'Email is required',
+            'email.email'       => 'Email must be a valid email address',
+            'password.required' => 'Password is required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Login validation failed',
+                'errors'  => $validator->errors(),
+            ], 200); // Custom status code 200
+        }
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+        $user = User::where('email', $request->email)->first();
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found with this email.',
+            ], 200); // Custom status code 200
+        }
+
+        if (! Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Incorrect password.',
+            ], 200); // Custom status code 200
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -71,10 +106,10 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
-            'data' => [
-                'user' => $user,
+            'data'    => [
+                'user'         => $user,
                 'access_token' => $token,
-                'token_type' => 'Bearer',
+                'token_type'   => 'Bearer',
             ],
         ]);
     }
@@ -101,6 +136,21 @@ class AuthController extends Controller
             'email' => 'required|email',
         ]);
 
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ], [
+            'email.required' => 'Email is required',
+            'email.email'    => 'Email must be a valid email address',
+            'email.exists'   => 'No user found with this email address',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Forgot password validation failed',
+                'errors'  => $validator->errors(),
+            ], 200); // Custom status code 200
+        }
+
         $status = Password::broker('users')->sendResetLink(
             $request->only('email')
         );
@@ -112,9 +162,10 @@ class AuthController extends Controller
             ]);
         }
 
-        throw ValidationException::withMessages([
-            'email' => [__($status)],
-        ]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to send password reset link',
+        ], 200); // Custom status code 200
     }
 
     /**
@@ -123,8 +174,8 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
+            'token'    => 'required',
+            'email'    => 'required|email',
             'password' => 'required|min:8|confirmed',
         ]);
 
@@ -132,7 +183,7 @@ class AuthController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->forceFill([
-                    'password' => Hash::make($password)
+                    'password' => Hash::make($password),
                 ])->save();
             }
         );

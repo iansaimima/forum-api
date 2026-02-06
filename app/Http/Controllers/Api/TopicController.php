@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -15,14 +14,74 @@ class TopicController extends Controller
      */
     public function index()
     {
-        $topics = Topic::with(['user', 'category', 'comments', 'likes'])
+        $topics = Topic::with(['user', 'category:id,name', 'comments', 'likes'])
             ->withCount(['comments', 'likes'])
             ->latest()
             ->paginate(20);
 
+        // Map data untuk menambahkan field createdAtAgo
+        $topics->getCollection()->transform(function ($topic) {
+            $topic->created_at_formatted = date('d M Y, H:i', strtotime($topic->created_at));
+            $topic->updated_at_formatted = date('d M Y, H:i', strtotime($topic->updated_at));
+
+            // human diff
+            $topic->created_at_ago = $topic->created_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $topic->created_at->diffForHumans();
+            $topic->updated_at_ago = $topic->updated_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $topic->updated_at->diffForHumans();
+
+            unset($topic->created_at, $topic->updated_at);
+
+            // lakukan juga pada $topics->user
+            $topic->user->created_at_formatted = date('d M Y, H:i', strtotime($topic->user->created_at));
+            $topic->user->updated_at_formatted = date('d M Y, H:i', strtotime($topic->user->updated_at));
+
+            // human diff
+            $topic->user->created_at_ago = $topic->user->created_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $topic->user->created_at->diffForHumans();
+            $topic->user->updated_at_ago = $topic->user->updated_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $topic->user->updated_at->diffForHumans();
+            unset($topic->user->created_at, $topic->user->updated_at);
+
+            // lakukan juga pada $topics->comments
+            foreach ($topic->comments as $comment) {
+                $comment->created_at_formatted = date('d M Y, H:i', strtotime($comment->created_at));
+                $comment->updated_at_formatted = date('d M Y, H:i', strtotime($comment->updated_at));
+
+                // human diff
+                $comment->created_at_ago = $comment->created_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $comment->created_at->diffForHumans();
+                $comment->updated_at_ago = $comment->updated_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $comment->updated_at->diffForHumans();
+                unset($comment->created_at, $comment->updated_at);
+            }
+
+            // lakukan juga pada $topic->likes
+            foreach ($topic->likes as $like) {
+                $like->created_at_formatted = date('d M Y, H:i', strtotime($like->created_at));
+                $like->updated_at_formatted = date('d M Y, H:i', strtotime($like->updated_at));
+
+                // human diff
+                $like->created_at_ago = $like->created_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $like->created_at->diffForHumans();
+                $like->updated_at_ago = $like->updated_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $like->updated_at->diffForHumans();
+                unset($like->created_at, $like->updated_at, $like->pivot);
+            }
+            return $topic;
+        });
+
         return response()->json([
             'success' => true,
-            'data' => $topics
+            'data'    => $topics,
         ]);
     }
 
@@ -32,8 +91,8 @@ class TopicController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'body' => 'required|string',
+            'title'         => 'required|string|max:255',
+            'body'          => 'required|string',
             'category_name' => 'required|string|max:255',
         ]);
 
@@ -41,8 +100,8 @@ class TopicController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
+                'errors'  => $validator->errors(),
+            ], 200);
         }
 
         // Find or create category
@@ -51,9 +110,9 @@ class TopicController extends Controller
         );
 
         $topic = Topic::create([
-            'title' => $request->title,
-            'body' => $request->body,
-            'user_id' => auth()->id(),
+            'title'             => $request->title,
+            'body'              => $request->body,
+            'user_id'           => auth()->id(),
             'topic_category_id' => $category->id,
         ]);
 
@@ -62,7 +121,7 @@ class TopicController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Topic created successfully',
-            'data' => $topic
+            'data'    => $topic,
         ], 201);
     }
 
@@ -71,20 +130,75 @@ class TopicController extends Controller
      */
     public function show($id)
     {
-        $topic = Topic::with(['user', 'category', 'comments.user', 'likes'])
+        $topic = Topic::with(['user', 'category:id,name', 'comments.user', 'likes'])
             ->withCount(['comments', 'likes'])
             ->find($id);
 
-        if (!$topic) {
+        if (! $topic) {
             return response()->json([
                 'success' => false,
-                'message' => 'Topic not found'
+                'message' => 'Topic not found',
             ], 404);
+        }
+
+        $topic->created_at_formatted = date('d M Y, H:i', strtotime($topic->created_at));
+        $topic->updated_at_formatted = date('d M Y, H:i', strtotime($topic->updated_at));
+        // remove $topic->created_at and $topic->updated_at
+        // human diff
+        $topic->created_at_ago = $topic->created_at->diffInMinutes(now()) < 5
+            ? 'just now'
+            : $topic->created_at->diffForHumans();
+        $topic->updated_at_ago = $topic->updated_at->diffInMinutes(now()) < 5
+            ? 'just now'
+            : $topic->updated_at->diffForHumans();
+        unset($topic->created_at, $topic->updated_at);
+
+        // lakukan juga pada $topics->user
+        $topic->user->created_at_formatted = date('d M Y, H:i', strtotime($topic->user->created_at));
+        $topic->user->updated_at_formatted = date('d M Y, H:i', strtotime($topic->user->updated_at));
+
+        // human diff
+        $topic->user->created_at_ago = $topic->user->created_at->diffInMinutes(now()) < 5
+            ? 'just now'
+            : $topic->user->created_at->diffForHumans();
+        $topic->user->updated_at_ago = $topic->user->updated_at->diffInMinutes(now()) < 5
+            ? 'just now'
+            : $topic->user->updated_at->diffForHumans();
+        unset($topic->user->created_at, $topic->user->updated_at);
+
+        // lakukan juga pada $topics->comments
+        foreach ($topic->comments as $comment) {
+            $comment->created_at_formatted = date('d M Y, H:i', strtotime($comment->created_at));
+            $comment->updated_at_formatted = date('d M Y, H:i', strtotime($comment->updated_at));
+
+            // human diff
+            $comment->created_at_ago = $comment->created_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $comment->created_at->diffForHumans();
+            $comment->updated_at_ago = $comment->updated_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $comment->updated_at->diffForHumans();
+            unset($comment->created_at, $comment->updated_at);
+        }
+
+        // lakukan juga pada $topic->likes
+        foreach ($topic->likes as $like) {
+            $like->created_at_formatted = date('d M Y, H:i', strtotime($like->created_at));
+            $like->updated_at_formatted = date('d M Y, H:i', strtotime($like->updated_at));
+
+            // human diff
+            $like->created_at_ago = $like->created_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $like->created_at->diffForHumans();
+            $like->updated_at_ago = $like->updated_at->diffInMinutes(now()) < 5
+                ? 'just now'
+                : $like->updated_at->diffForHumans();
+            unset($like->created_at, $like->updated_at, $like->pivot);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $topic
+            'data'    => $topic,
         ]);
     }
 
@@ -95,10 +209,10 @@ class TopicController extends Controller
     {
         $topic = Topic::find($id);
 
-        if (!$topic) {
+        if (! $topic) {
             return response()->json([
                 'success' => false,
-                'message' => 'Topic not found'
+                'message' => 'Topic not found',
             ], 404);
         }
 
@@ -106,13 +220,13 @@ class TopicController extends Controller
         if ($topic->user_id !== auth()->id()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized to update this topic'
+                'message' => 'Unauthorized to update this topic',
             ], 403);
         }
 
         $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:255',
-            'body' => 'sometimes|required|string',
+            'title'         => 'sometimes|required|string|max:255',
+            'body'          => 'sometimes|required|string',
             'category_name' => 'sometimes|required|string|max:255',
         ]);
 
@@ -120,8 +234,8 @@ class TopicController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
+                'errors'  => $validator->errors(),
+            ], 200);
         }
 
         // Update category if provided
@@ -146,7 +260,7 @@ class TopicController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Topic updated successfully',
-            'data' => $topic
+            'data'    => $topic,
         ]);
     }
 
@@ -157,10 +271,10 @@ class TopicController extends Controller
     {
         $topic = Topic::find($id);
 
-        if (!$topic) {
+        if (! $topic) {
             return response()->json([
                 'success' => false,
-                'message' => 'Topic not found'
+                'message' => 'Topic not found',
             ], 404);
         }
 
@@ -168,7 +282,7 @@ class TopicController extends Controller
         if ($topic->user_id !== auth()->id()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized to delete this topic'
+                'message' => 'Unauthorized to delete this topic',
             ], 403);
         }
 
@@ -176,7 +290,7 @@ class TopicController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Topic deleted successfully'
+            'message' => 'Topic deleted successfully',
         ]);
     }
 }
