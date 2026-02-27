@@ -343,12 +343,12 @@ class TopicController extends Controller
      */
     public function trending()
     {
-        $topics = Topic::with(['user', 'category:id,name', 'comments', 'likes'])
+        $topics = Topic::with(['user', 'category:id,name', 'likes'])
             ->withCount(['comments', 'likes'])
             ->orderBy('comments_count', 'desc')
             ->limit(10)
             ->get();
-            
+
         if ($topics->isEmpty()) {
             return response()->json([
                 'success' => true,
@@ -393,44 +393,6 @@ class TopicController extends Controller
                 }
 
                 unset($topic->user->created_at, $topic->user->updated_at);
-            }
-
-            // Format timestamps untuk comments
-            foreach ($topic->comments as $comment) {
-                if ($comment->created_at) {
-                    $comment->created_at_formatted = date('d M Y, H:i', strtotime($comment->created_at));
-                    $comment->created_at_ago       = $comment->created_at->diffInMinutes(now()) < 5
-                        ? 'just now'
-                        : $comment->created_at->diffForHumans();
-                }
-
-                if ($comment->updated_at) {
-                    $comment->updated_at_formatted = date('d M Y, H:i', strtotime($comment->updated_at));
-                    $comment->updated_at_ago       = $comment->updated_at->diffInMinutes(now()) < 5
-                        ? 'just now'
-                        : $comment->updated_at->diffForHumans();
-                }
-
-                unset($comment->created_at, $comment->updated_at);
-            }
-
-            // Format timestamps untuk likes
-            foreach ($topic->likes as $like) {
-                if ($like->created_at) {
-                    $like->created_at_formatted = date('d M Y, H:i', strtotime($like->created_at));
-                    $like->created_at_ago       = $like->created_at->diffInMinutes(now()) < 5
-                        ? 'just now'
-                        : $like->created_at->diffForHumans();
-                }
-
-                if ($like->updated_at) {
-                    $like->updated_at_formatted = date('d M Y, H:i', strtotime($like->updated_at));
-                    $like->updated_at_ago       = $like->updated_at->diffInMinutes(now()) < 5
-                        ? 'just now'
-                        : $like->updated_at->diffForHumans();
-                }
-
-                unset($like->created_at, $like->updated_at, $like->pivot);
             }
 
             return $topic;
