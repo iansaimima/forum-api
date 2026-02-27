@@ -15,7 +15,10 @@ class TopicController extends Controller
     public function index()
     {
         // Get IDs of users that the authenticated user is following
-        $followingIds = auth()->user()->following()->pluck('users.id');
+        $followingIds = auth()->user()->following()->pluck('users.id')->toArray();
+
+        // Add authenticated user's ID to the array
+        $followingIds[] = auth()->id();
 
         $topics = Topic::with(['user', 'category:id,name', 'comments', 'likes'])
             ->withCount(['comments', 'likes'])
