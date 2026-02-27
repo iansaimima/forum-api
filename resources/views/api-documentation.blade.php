@@ -433,13 +433,22 @@
                 <div class="accordion-content">
                     <div class="accordion-body">
                         <div class="auth-required">Authentication Required</div>
-                        <p class="description">Get all topics with pagination</p>
+                        <p class="description">Get topics from users you follow and your own topics with pagination</p>
 
                         <div class="api-section">
                             <h4>Query Parameters:</h4>
                             <div class="code-block">
                                 <pre>page (optional): Page number for pagination</pre>
                             </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Shows only topics from users you follow</li>
+                                <li>Also includes your own topics</li>
+                                <li>Use /topics/trending to see all trending topics</li>
+                            </ul>
                         </div>
 
                         <div class="api-section">
@@ -471,6 +480,57 @@
   }
 }</pre>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="endpoint-path">/topics/trending</span>
+                    </div>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="auth-required">Authentication Required</div>
+                        <p class="description">Get top 10 trending topics with most comments</p>
+
+                        <div class="api-section">
+                            <h4>Response (200):</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "title": "Laravel Best Practices",
+      "body": "What are the best practices...",
+      "user": {
+        "id": 1,
+        "name": "John Doe"
+      },
+      "category": {
+        "id": 1,
+        "name": "Laravel"
+      },
+      "comments_count": 25,
+      "likes_count": 10
+    }
+  ]
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Returns maximum 10 topics</li>
+                                <li>Sorted by comments count (descending)</li>
+                                <li>Includes all topic details with relationships</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -966,6 +1026,8 @@ page (optional): Page number</pre>
                     <li>Like endpoint uses toggle mechanism (same endpoint for like/unlike)</li>
                     <li>Users cannot follow themselves</li>
                     <li>Search excludes the currently logged-in user</li>
+                    <li><strong>GET /topics</strong> only shows topics from users you follow and your own topics</li>
+                    <li><strong>GET /topics/trending</strong> shows top 10 topics with most comments from all users</li>
                 </ul>
             </div>
         </div>

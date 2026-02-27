@@ -24,9 +24,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [TopicController::class, 'index']);
         Route::get('/trending', [TopicController::class, 'trending']);
         Route::post('/', [TopicController::class, 'store']);
-        Route::get('/{id}', [TopicController::class, 'show']);
         Route::put('/{id}', [TopicController::class, 'update']);
         Route::delete('/{id}', [TopicController::class, 'destroy']);
+        Route::get('/{id}', [TopicController::class, 'show']);
 
         // Topic Comments
         Route::get('/{topicId}/comments', [TopicCommentController::class, 'index']);
