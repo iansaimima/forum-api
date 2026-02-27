@@ -343,7 +343,7 @@ class TopicController extends Controller
      */
     public function trending()
     {
-        $topics = Topic::with(['user', 'category:id,name', 'likes'])
+        $topics = Topic::with(['user', 'category:id,name'])
             ->withCount(['comments', 'likes'])
             ->orderBy('comments_count', 'desc')
             ->limit(10)
