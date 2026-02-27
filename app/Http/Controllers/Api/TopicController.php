@@ -345,6 +345,7 @@ class TopicController extends Controller
     {
         $topics = Topic::with(['user', 'category:id,name'])
             ->withCount(['comments', 'likes'])
+            ->having('comments_count', '>', 0)
             ->orderBy('comments_count', 'desc')
             ->limit(10)
             ->get();
