@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Topics
     Route::prefix('topics')->group(function () {
         Route::get('/', [TopicController::class, 'index']);
+        Route::get('/trending', [TopicController::class, 'trending']);
         Route::post('/', [TopicController::class, 'store']);
         Route::get('/{id}', [TopicController::class, 'show']);
         Route::put('/{id}', [TopicController::class, 'update']);
