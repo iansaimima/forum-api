@@ -14,8 +14,12 @@ class TopicController extends Controller
      */
     public function index()
     {
+        // Get IDs of users that the authenticated user is following
+        $followingIds = auth()->user()->following()->pluck('id');
+
         $topics = Topic::with(['user', 'category:id,name', 'comments', 'likes'])
             ->withCount(['comments', 'likes'])
+            ->whereIn('user_id', $followingIds)
             ->latest()
             ->paginate(20);
 
