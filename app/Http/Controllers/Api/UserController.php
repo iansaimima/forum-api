@@ -45,6 +45,9 @@ class UserController extends Controller
                     : $user->updated_at->diffForHumans();
             }
 
+            // Check if authenticated user is following this user
+            $user->is_follow = auth()->user()->isFollowing($user->id);
+
             unset($user->created_at, $user->updated_at);
             return $user;
         });
@@ -206,6 +209,9 @@ class UserController extends Controller
                     : $follower->updated_at->diffForHumans();
             }
 
+            // Check if authenticated user is following this user
+            $follower->is_follow = auth()->user()->isFollowing($follower->id);
+
             unset($follower->created_at, $follower->updated_at, $follower->pivot);
             return $follower;
         });
@@ -248,6 +254,9 @@ class UserController extends Controller
                     ? 'just now'
                     : $user->updated_at->diffForHumans();
             }
+
+            // Check if authenticated user is following this user
+            $user->is_follow = auth()->user()->isFollowing($user->id);
 
             unset($user->created_at, $user->updated_at, $user->pivot);
             return $user;

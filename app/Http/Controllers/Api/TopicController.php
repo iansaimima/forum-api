@@ -101,6 +101,10 @@ class TopicController extends Controller
 
                 unset($like->created_at, $like->updated_at, $like->pivot);
             }
+
+            // Check if authenticated user has liked this topic
+            $topic->is_like = $topic->likes->contains('id', auth()->id());
+
             return $topic;
         });
 
@@ -240,6 +244,9 @@ class TopicController extends Controller
             unset($like->created_at, $like->updated_at, $like->pivot);
         }
 
+        // Check if authenticated user has liked this topic
+        $topic->is_liked = $topic->likes->contains('id', auth()->id());
+
         return response()->json([
             'success' => true,
             'data'    => $topic,
@@ -343,7 +350,7 @@ class TopicController extends Controller
      */
     public function trending()
     {
-        $topics = Topic::with(['user', 'category:id,name'])
+        $topics = Topic::with(['user', 'category:id,name', 'likes'])
             ->withCount(['comments', 'likes'])
             ->having('comments_count', '>', 0)
             ->orderBy('comments_count', 'desc')
@@ -395,6 +402,9 @@ class TopicController extends Controller
 
                 unset($topic->user->created_at, $topic->user->updated_at);
             }
+
+            // Check if authenticated user has liked this topic
+            $topic->is_liked = $topic->likes->contains('id', auth()->id());
 
             return $topic;
         });
