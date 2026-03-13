@@ -88,7 +88,7 @@ class UserController extends Controller
         }
 
         $data                 = $user->toArray();
-        $data['is_following'] = auth()->user()->isFollowing($id);
+        $data['is_follow'] = auth()->user()->isFollowing($id);
         unset($data['created_at'], $data['updated_at']);
 
         // tambahkan field is_you
