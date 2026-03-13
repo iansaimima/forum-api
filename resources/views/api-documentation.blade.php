@@ -1180,7 +1180,7 @@ page (optional): Page number</pre>
     "topics_count": 15,
     "followers_count": 20,
     "following_count": 10,
-    "is_following": false,
+    "is_follow": false,
     "is_you": false
   }
 }</pre>
