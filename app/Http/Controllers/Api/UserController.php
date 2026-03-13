@@ -267,4 +267,112 @@ class UserController extends Controller
             'data'    => $following,
         ]);
     }
+
+    /**
+     * Get topics created by a user
+     */
+    public function topics($id)
+    {
+        $user = User::find($id);
+
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+
+        $topics = $user->topics()
+            ->with(['user', 'category:id,name', 'comments', 'likes'])
+            ->withCount(['comments', 'likes'])
+            ->latest()
+            ->paginate(20);
+
+        // Transform data untuk format timestamps dan field tambahan
+        $topics->getCollection()->transform(function ($topic) {
+            // Format timestamps untuk topic
+            if ($topic->created_at) {
+                $topic->created_at_formatted = date('d M Y, H:i', strtotime($topic->created_at));
+                $topic->created_at_ago       = $topic->created_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $topic->created_at->diffForHumans();
+            }
+
+            if ($topic->updated_at) {
+                $topic->updated_at_formatted = date('d M Y, H:i', strtotime($topic->updated_at));
+                $topic->updated_at_ago       = $topic->updated_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $topic->updated_at->diffForHumans();
+            }
+
+            unset($topic->created_at, $topic->updated_at);
+
+            // Format timestamps untuk user
+            if ($topic->user) {
+                if ($topic->user->created_at) {
+                    $topic->user->created_at_formatted = date('d M Y, H:i', strtotime($topic->user->created_at));
+                    $topic->user->created_at_ago       = $topic->user->created_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $topic->user->created_at->diffForHumans();
+                }
+
+                if ($topic->user->updated_at) {
+                    $topic->user->updated_at_formatted = date('d M Y, H:i', strtotime($topic->user->updated_at));
+                    $topic->user->updated_at_ago       = $topic->user->updated_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $topic->user->updated_at->diffForHumans();
+                }
+
+                unset($topic->user->created_at, $topic->user->updated_at);
+            }
+
+            // Format timestamps untuk comments
+            foreach ($topic->comments as $comment) {
+                if ($comment->created_at) {
+                    $comment->created_at_formatted = date('d M Y, H:i', strtotime($comment->created_at));
+                    $comment->created_at_ago       = $comment->created_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $comment->created_at->diffForHumans();
+                }
+
+                if ($comment->updated_at) {
+                    $comment->updated_at_formatted = date('d M Y, H:i', strtotime($comment->updated_at));
+                    $comment->updated_at_ago       = $comment->updated_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $comment->updated_at->diffForHumans();
+                }
+
+                unset($comment->created_at, $comment->updated_at);
+            }
+
+            // Format timestamps untuk likes
+            foreach ($topic->likes as $like) {
+                if ($like->created_at) {
+                    $like->created_at_formatted = date('d M Y, H:i', strtotime($like->created_at));
+                    $like->created_at_ago       = $like->created_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $like->created_at->diffForHumans();
+                }
+
+                if ($like->updated_at) {
+                    $like->updated_at_formatted = date('d M Y, H:i', strtotime($like->updated_at));
+                    $like->updated_at_ago       = $like->updated_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $like->updated_at->diffForHumans();
+                }
+
+                unset($like->created_at, $like->updated_at, $like->pivot);
+            }
+
+            // Check if authenticated user has liked this topic
+            $topic->is_like = $topic->likes->contains('id', auth()->id());
+
+            return $topic;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $topics,
+        ]);
+    }
 }

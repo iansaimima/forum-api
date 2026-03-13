@@ -419,6 +419,131 @@
                 </div>
             </div>
 
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="method-badge method-post">POST</span>
+                        <span class="endpoint-path">/auth/forgot-password</span>
+                    </div>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p class="description">Request password reset link to be sent to user's email</p>
+
+                        <div class="api-section">
+                            <h4>Request Body:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "email": "john@example.com"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Success:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "message": "Password reset link sent to your email"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Validation Failed:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Forgot password validation failed",
+  "errors": {
+    "email": ["No user found with this email address"]
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>User will receive an email with password reset link</li>
+                                <li>Reset link contains a token that expires after a certain time</li>
+                                <li>Email must exist in the system</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="method-badge method-post">POST</span>
+                        <span class="endpoint-path">/auth/reset-password</span>
+                    </div>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p class="description">Reset user password using the token from email</p>
+
+                        <div class="api-section">
+                            <h4>Request Body:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "token": "reset_token_from_email",
+  "email": "john@example.com",
+  "password": "newpassword123",
+  "password_confirmation": "newpassword123"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Validation Rules:</h4>
+                            <div class="code-block">
+                                <pre>token: required
+email: required, must be valid email
+password: required, minimum 8 characters, must match confirmation
+password_confirmation: required, must match password</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Success:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "message": "Password reset successfully"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (422) - Validation Error:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": ["This password reset token is invalid."]
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Token must be valid and not expired</li>
+                                <li>Password must be at least 8 characters</li>
+                                <li>Password confirmation must match</li>
+                                <li>After successful reset, user must login with new password</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Topics -->
             <h2 class="section-title">📝 Topics</h2>
 
@@ -785,6 +910,47 @@
 }</pre>
                             </div>
                         </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Success:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "message": "Comment updated successfully",
+  "data": {
+    "id": 1,
+    "topic_id": 1,
+    "user_id": 2,
+    "body": "Updated comment text",
+    "user": {
+      "id": 2,
+      "name": "Jane Doe",
+      "username": "janedoe"
+    }
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (403) - Unauthorized:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "You are not authorized to update this comment"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Comment not found"
+}</pre>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -801,6 +967,36 @@
                     <div class="accordion-body">
                         <div class="auth-required">Authentication Required</div>
                         <p class="description">Delete a comment. Only the owner can delete their comment.</p>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Success:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "message": "Comment deleted successfully"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (403) - Unauthorized:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "You are not authorized to delete this comment"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Comment not found"
+}</pre>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -899,8 +1095,56 @@ page (optional): Page number</pre>
                         <div class="api-section">
                             <h4>Example:</h4>
                             <div class="code-block">
-                                <pre>GET /users/search?query=john</pre>
+                                <pre>GET /users/search?query=john&page=1</pre>
                             </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Success:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 2,
+        "name": "John Smith",
+        "username": "johnsmith",
+        "email": "johnsmith@example.com",
+        "created_at_formatted": "15 Feb 2026, 10:00",
+        "created_at_ago": "1 month ago",
+        "updated_at_formatted": "12 Mar 2026, 14:20",
+        "updated_at_ago": "1 day ago",
+        "is_follow": false
+      }
+    ],
+    "per_page": 20,
+    "total": 5,
+    "last_page": 1
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (422) - Validation Error:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Query parameter is required"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Searches in username, email, and name fields</li>
+                                <li>Results exclude the currently authenticated user</li>
+                                <li>is_follow indicates if you're following that user</li>
+                                <li>Returns 20 results per page</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -928,13 +1172,38 @@ page (optional): Page number</pre>
     "id": 1,
     "name": "John Doe",
     "username": "johndoe",
+    "email": "john@example.com",
+    "created_at_formatted": "01 Jan 2026, 00:00",
+    "created_at_ago": "2 months ago",
+    "updated_at_formatted": "10 Mar 2026, 15:30",
+    "updated_at_ago": "3 days ago",
     "topics_count": 15,
     "followers_count": 20,
     "following_count": 10,
-    "is_following": false
+    "is_following": false,
+    "is_you": false
   }
 }</pre>
                             </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - User Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "User not found"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>is_following: indicates if the authenticated user is following this profile</li>
+                                <li>is_you: true if viewing your own profile</li>
+                                <li>Includes counts for topics, followers, and following</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -954,11 +1223,41 @@ page (optional): Page number</pre>
                         <p class="description">Follow a user</p>
 
                         <div class="api-section">
-                            <h4>Response (200):</h4>
+                            <h4>Response (200) - Success:</h4>
                             <div class="code-block">
                                 <pre>{
   "success": true,
   "message": "User followed successfully"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (422) - Already Following:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "You are already following this user"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (422) - Cannot Follow Self:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "You cannot follow yourself"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - User Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "User not found"
 }</pre>
                             </div>
                         </div>
@@ -978,6 +1277,36 @@ page (optional): Page number</pre>
                     <div class="accordion-body">
                         <div class="auth-required">Authentication Required</div>
                         <p class="description">Unfollow a user</p>
+
+                        <div class="api-section">
+                            <h4>Response (200):</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "message": "User unfollowed successfully"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (422) - Not Following:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "You are not following this user"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - User Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "User not found"
+}</pre>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -993,7 +1322,61 @@ page (optional): Page number</pre>
                 <div class="accordion-content">
                     <div class="accordion-body">
                         <div class="auth-required">Authentication Required</div>
-                        <p class="description">Get list of user's followers</p>
+                        <p class="description">Get list of user's followers with pagination</p>
+
+                        <div class="api-section">
+                            <h4>Query Parameters:</h4>
+                            <div class="code-block">
+                                <pre>page (optional): Page number for pagination</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200):</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 2,
+        "name": "Jane Doe",
+        "username": "janedoe",
+        "email": "jane@example.com",
+        "created_at_formatted": "01 Feb 2026, 14:30",
+        "created_at_ago": "1 month ago",
+        "updated_at_formatted": "10 Mar 2026, 09:15",
+        "updated_at_ago": "3 days ago",
+        "is_follow": true
+      }
+    ],
+    "per_page": 20,
+    "total": 100,
+    "last_page": 5
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - User Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "User not found"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Returns paginated list of followers (20 per page)</li>
+                                <li>Includes is_follow field indicating if you follow them back</li>
+                                <li>Timestamps are formatted in both human-readable and relative formats</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1009,7 +1392,145 @@ page (optional): Page number</pre>
                 <div class="accordion-content">
                     <div class="accordion-body">
                         <div class="auth-required">Authentication Required</div>
-                        <p class="description">Get list of users that this user is following</p>
+                        <p class="description">Get list of users that this user is following with pagination</p>
+
+                        <div class="api-section">
+                            <h4>Query Parameters:</h4>
+                            <div class="code-block">
+                                <pre>page (optional): Page number for pagination</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200):</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 3,
+        "name": "Bob Smith",
+        "username": "bobsmith",
+        "email": "bob@example.com",
+        "created_at_formatted": "15 Jan 2026, 08:00",
+        "created_at_ago": "2 months ago",
+        "updated_at_formatted": "12 Mar 2026, 16:45",
+        "updated_at_ago": "1 day ago",
+        "is_follow": false
+      }
+    ],
+    "per_page": 20,
+    "total": 50,
+    "last_page": 3
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - User Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "User not found"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Returns paginated list of following (20 per page)</li>
+                                <li>Includes is_follow field indicating if you also follow them</li>
+                                <li>Can view following list of any user</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="endpoint-path">/users/{id}/topics</span>
+                    </div>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="auth-required">Authentication Required</div>
+                        <p class="description">Get all topics created by a specific user with pagination</p>
+
+                        <div class="api-section">
+                            <h4>Query Parameters:</h4>
+                            <div class="code-block">
+                                <pre>page (optional): Page number for pagination</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Shows all topics created by the specified user</li>
+                                <li>Can view topics from any user (not limited to following)</li>
+                                <li>Includes full topic details with user, category, comments, and likes</li>
+                                <li>Returns 20 topics per page</li>
+                            </ul>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200):</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "title": "Laravel Best Practices",
+        "body": "What are the best practices...",
+        "created_at_formatted": "13 Mar 2026, 10:30",
+        "created_at_ago": "2 hours ago",
+        "user": {
+          "id": 5,
+          "name": "John Doe",
+          "username": "johndoe",
+          "email": "john@example.com",
+          "created_at_formatted": "01 Jan 2026, 00:00",
+          "created_at_ago": "2 months ago"
+        },
+        "category": {
+          "id": 1,
+          "name": "Laravel"
+        },
+        "comments": [],
+        "likes": [],
+        "comments_count": 5,
+        "likes_count": 10,
+        "is_like": false
+      }
+    ],
+    "per_page": 20,
+    "total": 50,
+    "last_page": 3
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - User Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "User not found"
+}</pre>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1028,6 +1549,7 @@ page (optional): Page number</pre>
                     <li>Search excludes the currently logged-in user</li>
                     <li><strong>GET /topics</strong> only shows topics from users you follow and your own topics</li>
                     <li><strong>GET /topics/trending</strong> shows top 10 topics with most comments from all users</li>
+                    <li><strong>GET /users/{id}/topics</strong> shows all topics created by a specific user (any user, not limited to following)</li>
                 </ul>
             </div>
         </div>
