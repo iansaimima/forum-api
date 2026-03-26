@@ -76,6 +76,11 @@ class TopicLikeController extends Controller
                     : $user->updated_at->diffForHumans();
             }
             
+            // Add profile photo URL
+            $user->profile_photo_url = $user->profile_photo 
+                ? asset('storage/' . $user->profile_photo) 
+                : null;
+            
             unset($user->created_at, $user->updated_at, $user->pivot);
             return $user;
         });

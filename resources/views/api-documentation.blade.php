@@ -290,6 +290,16 @@
                 <p style="margin: 10px 0; color: #666;">This API uses Laravel Sanctum for authentication. After
                     login/register, include the token in the header:</p>
                 <code>Authorization: Bearer {your_token}</code>
+
+                <h3 style="margin-top: 20px;">Total Endpoints</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+                    <span style="background:#28a745;color:white;padding:5px 12px;border-radius:20px;font-size:0.85em;font-weight:600;">🔐 Auth &nbsp;5</span>
+                    <span style="background:#667eea;color:white;padding:5px 12px;border-radius:20px;font-size:0.85em;font-weight:600;">📝 Topics &nbsp;8</span>
+                    <span style="background:#17a2b8;color:white;padding:5px 12px;border-radius:20px;font-size:0.85em;font-weight:600;">💬 Comments &nbsp;4</span>
+                    <span style="background:#dc3545;color:white;padding:5px 12px;border-radius:20px;font-size:0.85em;font-weight:600;">❤️ Likes &nbsp;2</span>
+                    <span style="background:#fd7e14;color:white;padding:5px 12px;border-radius:20px;font-size:0.85em;font-weight:600;">👥 Users &nbsp;12</span>
+                    <span style="background:#764ba2;color:white;padding:5px 12px;border-radius:20px;font-size:0.85em;font-weight:700;">Total &nbsp;31</span>
+                </div>
             </div>
 
             <!-- Authentication -->
@@ -315,13 +325,22 @@
   "username": "johndoe",
   "email": "john@example.com",
   "password": "password123",
-  "password_confirmation": "password123"
+  "password_confirmation": "password123",
+  "phone": "+6281234567890",
+  "address": "Jakarta, Indonesia"
 }</pre>
                             </div>
                         </div>
 
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li><code>phone</code> and <code>address</code> are optional fields</li>
+                            </ul>
+                        </div>
+
                         <div class="api-section">
-                            <h4>Response (201):</h4>
+                            <h4>Response (201) - Success:</h4>
                             <div class="code-block">
                                 <pre>{
   "success": true,
@@ -331,9 +350,32 @@
       "id": 1,
       "name": "John Doe",
       "username": "johndoe",
-      "email": "john@example.com"
+      "email": "john@example.com",
+      "emailVerifiedAt": null,
+      "profilePhoto": null,
+      "phone": null,
+      "address": null,
+      "createdAtFormatted": "26 Mar 2026, 10:00",
+      "createdAtAgo": "just now",
+      "updatedAtFormatted": "26 Mar 2026, 10:00",
+      "updatedAtAgo": "just now"
     },
-    "access_token": "1|abc123..."
+    "accessToken": "1|abc123...",
+    "tokenType": "Bearer"
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Validation Failed:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Registration validation failed",
+  "errors": {
+    "email": ["The email has already been taken."],
+    "username": ["The username has already been taken."]
   }
 }</pre>
                             </div>
@@ -365,7 +407,7 @@
                         </div>
 
                         <div class="api-section">
-                            <h4>Response (200):</h4>
+                            <h4>Response (200) - Success:</h4>
                             <div class="code-block">
                                 <pre>{
   "success": true,
@@ -375,9 +417,49 @@
       "id": 1,
       "name": "John Doe",
       "username": "johndoe",
-      "email": "john@example.com"
+      "email": "john@example.com",
+      "emailVerifiedAt": null,
+      "profilePhoto": "profile_photos/johndoe.jpg",
+      "createdAtFormatted": "01 Jan 2026, 00:00",
+      "createdAtAgo": "2 months ago",
+      "updatedAtFormatted": "26 Mar 2026, 10:00",
+      "updatedAtAgo": "just now"
     },
-    "access_token": "2|xyz789..."
+    "accessToken": "2|xyz789...",
+    "tokenType": "Bearer"
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - User Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "User not found with this email."
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Wrong Password:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Incorrect password."
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Validation Failed:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Login validation failed",
+  "errors": {
+    "email": ["Email is required"]
   }
 }</pre>
                             </div>
@@ -411,7 +493,7 @@
                             <div class="code-block">
                                 <pre>{
   "success": true,
-  "message": "Logout successful"
+  "message": "Logged out successfully"
 }</pre>
                             </div>
                         </div>
@@ -582,26 +664,45 @@ password_confirmation: required, must match password</pre>
                                 <pre>{
   "success": true,
   "data": {
-    "current_page": 1,
+    "currentPage": 1,
     "data": [
       {
         "id": 1,
         "title": "Laravel Best Practices",
         "body": "What are the best practices...",
+        "userId": 1,
+        "topicCategoryId": 1,
+        "createdAtFormatted": "26 Mar 2026, 10:00",
+        "createdAtAgo": "2 hours ago",
+        "updatedAtFormatted": "26 Mar 2026, 12:00",
+        "updatedAtAgo": "just now",
+        "commentsCount": 5,
+        "likesCount": 10,
+        "isLike": false,
         "user": {
           "id": 1,
-          "name": "John Doe"
+          "name": "John Doe",
+          "username": "johndoe",
+          "email": "john@example.com",
+          "emailVerifiedAt": null,
+          "profilePhoto": "profile_photos/johndoe.jpg",
+          "createdAtFormatted": "01 Jan 2026, 00:00",
+          "createdAtAgo": "2 months ago",
+          "updatedAtFormatted": "26 Mar 2026, 10:00",
+          "updatedAtAgo": "just now",
+          "profilePhotoUrl": "https://domain.com/storage/profile_photos/johndoe.jpg"
         },
         "category": {
           "id": 1,
           "name": "Laravel"
         },
-        "comments_count": 5,
-        "likes_count": 10
+        "comments": [...],
+        "likes": [...]
       }
     ],
-    "per_page": 20,
-    "total": 50
+    "perPage": 20,
+    "total": 50,
+    "lastPage": 3
   }
 }</pre>
                             </div>
@@ -633,16 +734,33 @@ password_confirmation: required, must match password</pre>
       "id": 1,
       "title": "Laravel Best Practices",
       "body": "What are the best practices...",
+      "userId": 1,
+      "topicCategoryId": 1,
+      "createdAtFormatted": "26 Mar 2026, 10:00",
+      "createdAtAgo": "2 hours ago",
+      "updatedAtFormatted": "26 Mar 2026, 12:00",
+      "updatedAtAgo": "just now",
+      "commentsCount": 25,
+      "likesCount": 10,
+      "isLiked": false,
       "user": {
         "id": 1,
-        "name": "John Doe"
+        "name": "John Doe",
+        "username": "johndoe",
+        "email": "john@example.com",
+        "emailVerifiedAt": null,
+        "profilePhoto": "profile_photos/johndoe.jpg",
+        "createdAtFormatted": "01 Jan 2026, 00:00",
+        "createdAtAgo": "2 months ago",
+        "updatedAtFormatted": "26 Mar 2026, 10:00",
+        "updatedAtAgo": "just now",
+        "profilePhotoUrl": "https://domain.com/storage/profile_photos/johndoe.jpg"
       },
       "category": {
         "id": 1,
         "name": "Laravel"
       },
-      "comments_count": 25,
-      "likes_count": 10
+      "likes": [...]
     }
   ]
 }</pre>
@@ -655,6 +773,158 @@ password_confirmation: required, must match password</pre>
                                 <li>Returns maximum 10 topics</li>
                                 <li>Sorted by comments count (descending)</li>
                                 <li>Includes all topic details with relationships</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="endpoint-path">/topics/categories</span>
+                    </div>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="auth-required">Authentication Required</div>
+                        <p class="description">Get all distinct categories that have at least one topic, sorted alphabetically</p>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Success:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "JavaScript",
+      "topics_count": 8
+    },
+    {
+      "id": 2,
+      "name": "Laravel",
+      "topics_count": 12
+    },
+    {
+      "id": 3,
+      "name": "PHP",
+      "topics_count": 5
+    }
+  ]
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Only returns categories that have at least one topic</li>
+                                <li>Sorted alphabetically by category name</li>
+                                <li>Includes <code>topics_count</code> for each category</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="endpoint-path">/topics/category/{categoryName}</span>
+                    </div>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="auth-required">Authentication Required</div>
+                        <p class="description">Get paginated topics filtered by a specific category name</p>
+
+                        <div class="api-section">
+                            <h4>URL Parameters:</h4>
+                            <div class="code-block">
+                                <pre>categoryName (required): The name of the category (e.g. Laravel, PHP, JavaScript)</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Query Parameters:</h4>
+                            <div class="code-block">
+                                <pre>page (optional): Page number for pagination</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Example:</h4>
+                            <div class="code-block">
+                                <pre>GET /topics/category/Laravel?page=1</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Success:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "category": "Laravel",
+  "data": {
+    "currentPage": 1,
+    "data": [
+      {
+        "id": 1,
+        "title": "Laravel Best Practices",
+        "body": "What are the best practices...",
+        "userId": 1,
+        "topicCategoryId": 1,
+        "createdAtFormatted": "26 Mar 2026, 10:00",
+        "createdAtAgo": "2 hours ago",
+        "updatedAtFormatted": "26 Mar 2026, 12:00",
+        "updatedAtAgo": "just now",
+        "commentsCount": 5,
+        "likesCount": 10,
+        "isLiked": false,
+        "user": {
+          "id": 1,
+          "name": "John Doe",
+          "username": "johndoe",
+          "email": "john@example.com",
+          "profilePhotoUrl": "https://domain.com/storage/profile_photos/johndoe.jpg"
+        },
+        "category": {
+          "id": 1,
+          "name": "Laravel"
+        },
+        "comments": [...],
+        "likes": [...]
+      }
+    ],
+    "perPage": 20,
+    "total": 30,
+    "lastPage": 2
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - Category Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Category not found"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Category name is case-sensitive</li>
+                                <li>Returns 20 topics per page, sorted by latest</li>
+                                <li>Includes full topic details with user, category, comments, and likes</li>
                             </ul>
                         </div>
                     </div>
@@ -687,7 +957,7 @@ password_confirmation: required, must match password</pre>
                         </div>
 
                         <div class="api-section">
-                            <h4>Response (201):</h4>
+                            <h4>Response (201) - Success:</h4>
                             <div class="code-block">
                                 <pre>{
   "success": true,
@@ -695,9 +965,35 @@ password_confirmation: required, must match password</pre>
   "data": {
     "id": 1,
     "title": "Laravel Best Practices",
-    "body": "What are the best practices...",
-    "user_id": 1,
-    "topic_category_id": 1
+    "body": "What are the best practices when using Laravel?",
+    "userId": 1,
+    "topicCategoryId": 1,
+    "createdAt": "2026-03-26T10:00:00.000000Z",
+    "updatedAt": "2026-03-26T10:00:00.000000Z",
+    "user": {
+      "id": 1,
+      "name": "John Doe",
+      "username": "johndoe",
+      "email": "john@example.com"
+    },
+    "category": {
+      "id": 1,
+      "name": "Laravel"
+    }
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Validation Error:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Validation error",
+  "errors": {
+    "title": ["The title field is required."],
+    "categoryName": ["The category name field is required."]
   }
 }</pre>
                             </div>
@@ -720,7 +1016,7 @@ password_confirmation: required, must match password</pre>
                         <p class="description">Get detailed information about a specific topic</p>
 
                         <div class="api-section">
-                            <h4>Response (200):</h4>
+                            <h4>Response (200) - Success:</h4>
                             <div class="code-block">
                                 <pre>{
   "success": true,
@@ -728,12 +1024,63 @@ password_confirmation: required, must match password</pre>
     "id": 1,
     "title": "Laravel Best Practices",
     "body": "What are the best practices...",
-    "user": {...},
-    "category": {...},
-    "comments": [...],
-    "comments_count": 5,
-    "likes_count": 10
+    "userId": 1,
+    "topicCategoryId": 1,
+    "createdAtFormatted": "26 Mar 2026, 10:00",
+    "createdAtAgo": "2 hours ago",
+    "updatedAtFormatted": "26 Mar 2026, 12:00",
+    "updatedAtAgo": "just now",
+    "commentsCount": 5,
+    "likesCount": 10,
+    "isLiked": false,
+    "user": {
+      "id": 1,
+      "name": "John Doe",
+      "username": "johndoe",
+      "email": "john@example.com",
+      "emailVerifiedAt": null,
+      "profilePhoto": "profile_photos/johndoe.jpg",
+      "createdAtFormatted": "01 Jan 2026, 00:00",
+      "createdAtAgo": "2 months ago",
+      "updatedAtFormatted": "26 Mar 2026, 10:00",
+      "updatedAtAgo": "just now",
+      "profilePhotoUrl": "https://domain.com/storage/profile_photos/johndoe.jpg"
+    },
+    "category": {
+      "id": 1,
+      "name": "Laravel"
+    },
+    "comments": [
+      {
+        "id": 1,
+        "topicId": 1,
+        "userId": 2,
+        "body": "Great question!",
+        "createdAtFormatted": "26 Mar 2026, 10:30",
+        "createdAtAgo": "30 minutes ago",
+        "updatedAtFormatted": "26 Mar 2026, 10:30",
+        "updatedAtAgo": "30 minutes ago",
+        "user": {
+          "id": 2,
+          "name": "Jane Doe",
+          "username": "janedoe",
+          "email": "jane@example.com",
+          "profilePhotoUrl": "https://domain.com/storage/profile_photos/janedoe.jpg"
+        }
+      }
+    ],
+    "likes": [...]
   }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Topic not found"
 }</pre>
                             </div>
                         </div>
@@ -755,7 +1102,7 @@ password_confirmation: required, must match password</pre>
                         <p class="description">Update a topic. Only the owner can update their topic.</p>
 
                         <div class="api-section">
-                            <h4>Request Body:</h4>
+                            <h4>Request Body (all fields optional):</h4>
                             <div class="code-block">
                                 <pre>{
   "title": "Updated Title",
@@ -766,12 +1113,50 @@ password_confirmation: required, must match password</pre>
                         </div>
 
                         <div class="api-section">
-                            <h4>Response (200):</h4>
+                            <h4>Response (200) - Success:</h4>
                             <div class="code-block">
                                 <pre>{
   "success": true,
   "message": "Topic updated successfully",
-  "data": {...}
+  "data": {
+    "id": 1,
+    "title": "Updated Title",
+    "body": "Updated body content",
+    "userId": 1,
+    "topicCategoryId": 2,
+    "createdAt": "2026-03-26T10:00:00.000000Z",
+    "updatedAt": "2026-03-26T12:00:00.000000Z",
+    "user": {
+      "id": 1,
+      "name": "John Doe",
+      "username": "johndoe",
+      "email": "john@example.com"
+    },
+    "category": {
+      "id": 2,
+      "name": "PHP"
+    }
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (403) - Unauthorized:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Unauthorized to update this topic"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Topic not found"
 }</pre>
                             </div>
                         </div>
@@ -793,11 +1178,31 @@ password_confirmation: required, must match password</pre>
                         <p class="description">Delete a topic. Only the owner can delete their topic.</p>
 
                         <div class="api-section">
-                            <h4>Response (200):</h4>
+                            <h4>Response (200) - Success:</h4>
                             <div class="code-block">
                                 <pre>{
   "success": true,
   "message": "Topic deleted successfully"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (403) - Unauthorized:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Unauthorized to delete this topic"
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Topic not found"
 }</pre>
                             </div>
                         </div>
@@ -822,25 +1227,45 @@ password_confirmation: required, must match password</pre>
                         <p class="description">Get all comments for a specific topic</p>
 
                         <div class="api-section">
-                            <h4>Response (200):</h4>
+                            <h4>Response (200) - Success:</h4>
                             <div class="code-block">
                                 <pre>{
   "success": true,
   "data": {
-    "current_page": 1,
+    "currentPage": 1,
     "data": [
       {
         "id": 1,
-        "topic_id": 1,
-        "user_id": 2,
+        "topicId": 1,
+        "userId": 2,
         "body": "Great question!",
+        "createdAtAgo": "30 minutes ago",
+        "createdAtFormatted": "26 Mar 2026, 10:30",
+        "updatedAtAgo": "30 minutes ago",
+        "updatedAtFormatted": "26 Mar 2026, 10:30",
         "user": {
           "id": 2,
-          "name": "Jane Doe"
+          "name": "Jane Doe",
+          "email": "jane@example.com",
+          "username": "janedoe",
+          "profilePhotoUrl": "https://domain.com/storage/profile_photos/janedoe.jpg"
         }
       }
-    ]
+    ],
+    "perPage": 20,
+    "total": 10,
+    "lastPage": 1
   }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - Topic Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Topic not found"
 }</pre>
                             </div>
                         </div>
@@ -871,17 +1296,36 @@ password_confirmation: required, must match password</pre>
                         </div>
 
                         <div class="api-section">
-                            <h4>Response (201):</h4>
+                            <h4>Response (201) - Success:</h4>
                             <div class="code-block">
                                 <pre>{
   "success": true,
   "message": "Comment created successfully",
   "data": {
     "id": 1,
-    "topic_id": 1,
+    "topicId": 1,
+    "userId": 2,
     "body": "This is a great topic!",
-    "user": {...}
+    "createdAt": "2026-03-26T10:00:00.000000Z",
+    "updatedAt": "2026-03-26T10:00:00.000000Z",
+    "user": {
+      "id": 2,
+      "name": "Jane Doe",
+      "username": "janedoe",
+      "email": "jane@example.com",
+      "profilePhotoUrl": "https://domain.com/storage/profile_photos/janedoe.jpg"
+    }
   }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - Topic Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Topic not found"
 }</pre>
                             </div>
                         </div>
@@ -919,13 +1363,17 @@ password_confirmation: required, must match password</pre>
   "message": "Comment updated successfully",
   "data": {
     "id": 1,
-    "topic_id": 1,
-    "user_id": 2,
+    "topicId": 1,
+    "userId": 2,
     "body": "Updated comment text",
+    "createdAt": "2026-03-26T10:00:00.000000Z",
+    "updatedAt": "2026-03-26T12:00:00.000000Z",
     "user": {
       "id": 2,
       "name": "Jane Doe",
-      "username": "janedoe"
+      "username": "janedoe",
+      "email": "jane@example.com",
+      "profilePhotoUrl": "https://domain.com/storage/profile_photos/janedoe.jpg"
     }
   }
 }</pre>
@@ -937,7 +1385,7 @@ password_confirmation: required, must match password</pre>
                             <div class="code-block">
                                 <pre>{
   "success": false,
-  "message": "You are not authorized to update this comment"
+  "message": "Unauthorized to update this comment"
 }</pre>
                             </div>
                         </div>
@@ -983,7 +1431,7 @@ password_confirmation: required, must match password</pre>
                             <div class="code-block">
                                 <pre>{
   "success": false,
-  "message": "You are not authorized to delete this comment"
+  "message": "Unauthorized to delete this comment"
 }</pre>
                             </div>
                         </div>
@@ -1018,15 +1466,39 @@ password_confirmation: required, must match password</pre>
                         <p class="description">Toggle like/unlike on a topic</p>
 
                         <div class="api-section">
-                            <h4>Response (200):</h4>
+                            <h4>Response (200) - Liked:</h4>
                             <div class="code-block">
                                 <pre>{
   "success": true,
   "message": "Topic liked successfully",
   "data": {
     "liked": true,
-    "likes_count": 11
+    "likesCount": 11
   }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Unliked:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "message": "Topic unliked successfully",
+  "data": {
+    "liked": false,
+    "likesCount": 10
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - Topic Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Topic not found"
 }</pre>
                             </div>
                         </div>
@@ -1048,19 +1520,39 @@ password_confirmation: required, must match password</pre>
                         <p class="description">Get list of users who liked a topic</p>
 
                         <div class="api-section">
-                            <h4>Response (200):</h4>
+                            <h4>Response (200) - Success:</h4>
                             <div class="code-block">
                                 <pre>{
   "success": true,
   "data": {
+    "currentPage": 1,
     "data": [
       {
         "id": 2,
         "name": "Jane Doe",
-        "username": "janedoe"
+        "username": "janedoe",
+        "email": "jane@example.com",
+        "createdAtFormatted": "01 Feb 2026, 14:30",
+        "createdAtAgo": "1 month ago",
+        "updatedAtFormatted": "10 Mar 2026, 09:15",
+        "updatedAtAgo": "3 days ago",
+        "profilePhotoUrl": "https://domain.com/storage/profile_photos/janedoe.jpg"
       }
-    ]
+    ],
+    "perPage": 20,
+    "total": 11,
+    "lastPage": 1
   }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (404) - Topic Not Found:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Topic not found"
 }</pre>
                             </div>
                         </div>
@@ -1105,23 +1597,24 @@ page (optional): Page number</pre>
                                 <pre>{
   "success": true,
   "data": {
-    "current_page": 1,
+    "currentPage": 1,
     "data": [
       {
         "id": 2,
         "name": "John Smith",
         "username": "johnsmith",
         "email": "johnsmith@example.com",
-        "created_at_formatted": "15 Feb 2026, 10:00",
-        "created_at_ago": "1 month ago",
-        "updated_at_formatted": "12 Mar 2026, 14:20",
-        "updated_at_ago": "1 day ago",
-        "is_follow": false
+        "createdAtFormatted": "15 Feb 2026, 10:00",
+        "createdAtAgo": "1 month ago",
+        "updatedAtFormatted": "12 Mar 2026, 14:20",
+        "updatedAtAgo": "1 day ago",
+        "isFollow": false,
+        "profilePhotoUrl": "https://domain.com/storage/profile_photos/johnsmith.jpg"
       }
     ],
-    "per_page": 20,
+    "perPage": 20,
     "total": 5,
-    "last_page": 1
+    "lastPage": 1
   }
 }</pre>
                             </div>
@@ -1142,7 +1635,7 @@ page (optional): Page number</pre>
                             <ul>
                                 <li>Searches in username, email, and name fields</li>
                                 <li>Results exclude the currently authenticated user</li>
-                                <li>is_follow indicates if you're following that user</li>
+                                <li><code>isFollow</code> indicates if you're following that user</li>
                                 <li>Returns 20 results per page</li>
                             </ul>
                         </div>
@@ -1173,15 +1666,18 @@ page (optional): Page number</pre>
     "name": "John Doe",
     "username": "johndoe",
     "email": "john@example.com",
-    "created_at_formatted": "01 Jan 2026, 00:00",
-    "created_at_ago": "2 months ago",
-    "updated_at_formatted": "10 Mar 2026, 15:30",
-    "updated_at_ago": "3 days ago",
-    "topics_count": 15,
-    "followers_count": 20,
-    "following_count": 10,
-    "is_follow": false,
-    "is_you": false
+    "emailVerifiedAt": null,
+    "profilePhoto": "profile_photos/johndoe.jpg",
+    "createdAtFormatted": "01 Jan 2026, 00:00",
+    "createdAtAgo": "2 months ago",
+    "updatedAtFormatted": "10 Mar 2026, 15:30",
+    "updatedAtAgo": "3 days ago",
+    "topicsCount": 15,
+    "followersCount": 20,
+    "followingCount": 10,
+    "isFollow": false,
+    "isYou": false,
+    "profilePhotoUrl": "https://domain.com/storage/profile_photos/johndoe.jpg"
   }
 }</pre>
                             </div>
@@ -1200,8 +1696,8 @@ page (optional): Page number</pre>
                         <div class="note">
                             <h4>📌 Note</h4>
                             <ul>
-                                <li>is_following: indicates if the authenticated user is following this profile</li>
-                                <li>is_you: true if viewing your own profile</li>
+                                <li><code>isFollow</code>: indicates if the authenticated user is following this profile</li>
+                                <li><code>isYou</code>: true if viewing your own profile</li>
                                 <li>Includes counts for topics, followers, and following</li>
                             </ul>
                         </div>
@@ -1337,23 +1833,24 @@ page (optional): Page number</pre>
                                 <pre>{
   "success": true,
   "data": {
-    "current_page": 1,
+    "currentPage": 1,
     "data": [
       {
         "id": 2,
         "name": "Jane Doe",
         "username": "janedoe",
         "email": "jane@example.com",
-        "created_at_formatted": "01 Feb 2026, 14:30",
-        "created_at_ago": "1 month ago",
-        "updated_at_formatted": "10 Mar 2026, 09:15",
-        "updated_at_ago": "3 days ago",
-        "is_follow": true
+        "createdAtFormatted": "01 Feb 2026, 14:30",
+        "createdAtAgo": "1 month ago",
+        "updatedAtFormatted": "10 Mar 2026, 09:15",
+        "updatedAtAgo": "3 days ago",
+        "isFollow": true,
+        "profilePhotoUrl": "https://domain.com/storage/profile_photos/janedoe.jpg"
       }
     ],
-    "per_page": 20,
+    "perPage": 20,
     "total": 100,
-    "last_page": 5
+    "lastPage": 5
   }
 }</pre>
                             </div>
@@ -1373,7 +1870,7 @@ page (optional): Page number</pre>
                             <h4>📌 Note</h4>
                             <ul>
                                 <li>Returns paginated list of followers (20 per page)</li>
-                                <li>Includes is_follow field indicating if you follow them back</li>
+                                <li>Includes <code>isFollow</code> field indicating if you follow them back</li>
                                 <li>Timestamps are formatted in both human-readable and relative formats</li>
                             </ul>
                         </div>
@@ -1407,23 +1904,24 @@ page (optional): Page number</pre>
                                 <pre>{
   "success": true,
   "data": {
-    "current_page": 1,
+    "currentPage": 1,
     "data": [
       {
         "id": 3,
         "name": "Bob Smith",
         "username": "bobsmith",
         "email": "bob@example.com",
-        "created_at_formatted": "15 Jan 2026, 08:00",
-        "created_at_ago": "2 months ago",
-        "updated_at_formatted": "12 Mar 2026, 16:45",
-        "updated_at_ago": "1 day ago",
-        "is_follow": false
+        "createdAtFormatted": "15 Jan 2026, 08:00",
+        "createdAtAgo": "2 months ago",
+        "updatedAtFormatted": "12 Mar 2026, 16:45",
+        "updatedAtAgo": "1 day ago",
+        "isFollow": false,
+        "profilePhotoUrl": null
       }
     ],
-    "per_page": 20,
+    "perPage": 20,
     "total": 50,
-    "last_page": 3
+    "lastPage": 3
   }
 }</pre>
                             </div>
@@ -1443,7 +1941,7 @@ page (optional): Page number</pre>
                             <h4>📌 Note</h4>
                             <ul>
                                 <li>Returns paginated list of following (20 per page)</li>
-                                <li>Includes is_follow field indicating if you also follow them</li>
+                                <li>Includes <code>isFollow</code> field indicating if you also follow them</li>
                                 <li>Can view following list of any user</li>
                             </ul>
                         </div>
@@ -1487,36 +1985,43 @@ page (optional): Page number</pre>
                                 <pre>{
   "success": true,
   "data": {
-    "current_page": 1,
+    "currentPage": 1,
     "data": [
       {
         "id": 1,
         "title": "Laravel Best Practices",
         "body": "What are the best practices...",
-        "created_at_formatted": "13 Mar 2026, 10:30",
-        "created_at_ago": "2 hours ago",
+        "userId": 1,
+        "topicCategoryId": 1,
+        "createdAtFormatted": "13 Mar 2026, 10:30",
+        "createdAtAgo": "2 hours ago",
+        "updatedAtFormatted": "13 Mar 2026, 10:30",
+        "updatedAtAgo": "2 hours ago",
+        "commentsCount": 5,
+        "likesCount": 10,
+        "isLike": false,
         "user": {
-          "id": 5,
+          "id": 1,
           "name": "John Doe",
           "username": "johndoe",
           "email": "john@example.com",
-          "created_at_formatted": "01 Jan 2026, 00:00",
-          "created_at_ago": "2 months ago"
+          "createdAtFormatted": "01 Jan 2026, 00:00",
+          "createdAtAgo": "2 months ago",
+          "updatedAtFormatted": "13 Mar 2026, 10:30",
+          "updatedAtAgo": "2 hours ago",
+          "profilePhotoUrl": "https://domain.com/storage/profile_photos/johndoe.jpg"
         },
         "category": {
           "id": 1,
           "name": "Laravel"
         },
-        "comments": [],
-        "likes": [],
-        "comments_count": 5,
-        "likes_count": 10,
-        "is_like": false
+        "comments": [...],
+        "likes": [...]
       }
     ],
-    "per_page": 20,
+    "perPage": 20,
     "total": 50,
-    "last_page": 3
+    "lastPage": 3
   }
 }</pre>
                             </div>
@@ -1535,6 +2040,319 @@ page (optional): Page number</pre>
                 </div>
             </div>
 
+            <!-- Profile -->
+            <h2 class="section-title">🖼️ Profile</h2>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="endpoint-path">/users/profile</span>
+                    </div>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="auth-required">Authentication Required</div>
+                        <p class="description">Get the authenticated user's own profile with stats</p>
+
+                        <div class="api-section">
+                            <h4>Response (200):</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "John Doe",
+    "username": "johndoe",
+    "email": "john@example.com",
+    "emailVerifiedAt": null,
+    "profilePhoto": "profile_photos/johndoe.jpg",
+    "createdAtFormatted": "01 Jan 2026, 00:00",
+    "createdAtAgo": "2 months ago",
+    "updatedAtFormatted": "27 Mar 2026, 10:00",
+    "updatedAtAgo": "just now",
+    "topicsCount": 15,
+    "followersCount": 20,
+    "followingCount": 10,
+    "isFollow": false,
+    "isYou": true,
+    "profilePhotoUrl": "https://domain.com/storage/profile_photos/johndoe.jpg"
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li><code>isYou</code> will always be <code>true</code> for this endpoint</li>
+                                <li>Response is identical to <code>GET /users/{id}</code> for the authenticated user</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="endpoint-path">/users/profile-followers</span>
+                    </div>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="auth-required">Authentication Required</div>
+                        <p class="description">Get the authenticated user's own followers list with pagination</p>
+
+                        <div class="api-section">
+                            <h4>Query Parameters:</h4>
+                            <div class="code-block">
+                                <pre>page (optional): Page number for pagination</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200):</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "data": {
+    "currentPage": 1,
+    "data": [
+      {
+        "id": 2,
+        "name": "Jane Doe",
+        "username": "janedoe",
+        "email": "jane@example.com",
+        "createdAtFormatted": "01 Feb 2026, 14:30",
+        "createdAtAgo": "1 month ago",
+        "updatedAtFormatted": "10 Mar 2026, 09:15",
+        "updatedAtAgo": "3 days ago",
+        "isFollow": true,
+        "profilePhotoUrl": "https://domain.com/storage/profile_photos/janedoe.jpg"
+      }
+    ],
+    "perPage": 20,
+    "total": 100,
+    "lastPage": 5
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Response is identical to <code>GET /users/{id}/followers</code> for the authenticated user</li>
+                                <li>Includes <code>isFollow</code> field indicating if you follow them back</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="endpoint-path">/users/profile-following</span>
+                    </div>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="auth-required">Authentication Required</div>
+                        <p class="description">Get the list of users that the authenticated user is following with pagination</p>
+
+                        <div class="api-section">
+                            <h4>Query Parameters:</h4>
+                            <div class="code-block">
+                                <pre>page (optional): Page number for pagination</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200):</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "data": {
+    "currentPage": 1,
+    "data": [
+      {
+        "id": 3,
+        "name": "Bob Smith",
+        "username": "bobsmith",
+        "email": "bob@example.com",
+        "createdAtFormatted": "15 Jan 2026, 08:00",
+        "createdAtAgo": "2 months ago",
+        "updatedAtFormatted": "12 Mar 2026, 16:45",
+        "updatedAtAgo": "1 day ago",
+        "isFollow": false,
+        "profilePhotoUrl": null
+      }
+    ],
+    "perPage": 20,
+    "total": 50,
+    "lastPage": 3
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Response is identical to <code>GET /users/{id}/following</code> for the authenticated user</li>
+                                <li>Includes <code>isFollow</code> field indicating if you also follow them</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="endpoint-path">/users/profile-topics</span>
+                    </div>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="auth-required">Authentication Required</div>
+                        <p class="description">Get all topics created by the authenticated user with pagination</p>
+
+                        <div class="api-section">
+                            <h4>Query Parameters:</h4>
+                            <div class="code-block">
+                                <pre>page (optional): Page number for pagination</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200):</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "data": {
+    "currentPage": 1,
+    "data": [
+      {
+        "id": 1,
+        "title": "Laravel Best Practices",
+        "body": "What are the best practices...",
+        "userId": 1,
+        "topicCategoryId": 1,
+        "createdAtFormatted": "13 Mar 2026, 10:30",
+        "createdAtAgo": "2 hours ago",
+        "updatedAtFormatted": "13 Mar 2026, 10:30",
+        "updatedAtAgo": "2 hours ago",
+        "commentsCount": 5,
+        "likesCount": 10,
+        "isLike": false,
+        "user": {
+          "id": 1,
+          "name": "John Doe",
+          "username": "johndoe",
+          "email": "john@example.com",
+          "createdAtFormatted": "01 Jan 2026, 00:00",
+          "createdAtAgo": "2 months ago",
+          "updatedAtFormatted": "13 Mar 2026, 10:30",
+          "updatedAtAgo": "2 hours ago",
+          "profilePhotoUrl": "https://domain.com/storage/profile_photos/johndoe.jpg"
+        },
+        "category": {
+          "id": 1,
+          "name": "Laravel"
+        },
+        "comments": [...],
+        "likes": [...]
+      }
+    ],
+    "perPage": 20,
+    "total": 50,
+    "lastPage": 3
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Response is identical to <code>GET /users/{id}/topics</code> for the authenticated user</li>
+                                <li>Includes full topic details with user, category, comments, and likes</li>
+                                <li>Returns 20 topics per page</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="method-badge method-post">POST</span>
+                        <span class="endpoint-path">/users/profile-photo</span>
+                    </div>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="auth-required">Authentication Required</div>
+                        <p class="description">Upload or replace the authenticated user's profile photo</p>
+
+                        <div class="api-section">
+                            <h4>Request Body (multipart/form-data):</h4>
+                            <div class="code-block">
+                                <pre>photo: (file) jpeg/png/jpg/gif, max 2MB</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Success:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": true,
+  "message": "Profile photo uploaded successfully",
+  "data": {
+    "profilePhoto": "profile_photos/johndoe.jpg",
+    "profilePhotoUrl": "https://domain.com/storage/profile_photos/johndoe.jpg"
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (422) - Validation Error:</h4>
+                            <div class="code-block">
+                                <pre>{
+  "message": "The photo field is required.",
+  "errors": {
+    "photo": ["The photo must be an image.", "The photo must not be greater than 2048 kilobytes."]
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="note">
+                            <h4>📌 Note</h4>
+                            <ul>
+                                <li>Accepted formats: jpeg, png, jpg, gif</li>
+                                <li>Maximum file size: 2MB</li>
+                                <li>Previous photo is automatically deleted when a new one is uploaded</li>
+                                <li>Filename is set to <code>{username}.{extension}</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Notes -->
             <div class="note">
                 <h4>📌 Important Notes</h4>
@@ -1547,6 +2365,8 @@ page (optional): Page number</pre>
                     <li>Like endpoint uses toggle mechanism (same endpoint for like/unlike)</li>
                     <li>Users cannot follow themselves</li>
                     <li>Search excludes the currently logged-in user</li>
+                    <li>All response keys are in <strong>camelCase</strong></li>
+                    <li><code>profilePhotoUrl</code> is the full URL to the profile photo, <code>profilePhoto</code> is the raw storage path</li>
                     <li><strong>GET /topics</strong> only shows topics from users you follow and your own topics</li>
                     <li><strong>GET /topics/trending</strong> shows top 10 topics with most comments from all users</li>
                     <li><strong>GET /users/{id}/topics</strong> shows all topics created by a specific user (any user, not limited to following)</li>

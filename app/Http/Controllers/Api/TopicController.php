@@ -61,6 +61,11 @@ class TopicController extends Controller
                         : $topic->user->updated_at->diffForHumans();
                 }
 
+                // Add profile photo URL
+                $topic->user->profile_photo_url = $topic->user->profile_photo
+                    ? asset('storage/' . $topic->user->profile_photo)
+                    : null;
+
                 unset($topic->user->created_at, $topic->user->updated_at);
             }
 
@@ -78,6 +83,13 @@ class TopicController extends Controller
                     $comment->updated_at_ago       = $comment->updated_at->diffInMinutes(now()) < 5
                         ? 'just now'
                         : $comment->updated_at->diffForHumans();
+                }
+
+                // Add profile photo URL for comment user
+                if ($comment->user) {
+                    $comment->user->profile_photo_url = $comment->user->profile_photo
+                        ? asset('storage/' . $comment->user->profile_photo)
+                        : null;
                 }
 
                 unset($comment->created_at, $comment->updated_at);
@@ -98,6 +110,11 @@ class TopicController extends Controller
                         ? 'just now'
                         : $like->updated_at->diffForHumans();
                 }
+
+                // Add profile photo URL for liked user
+                $like->profile_photo_url = $like->profile_photo
+                    ? asset('storage/' . $like->profile_photo)
+                    : null;
 
                 unset($like->created_at, $like->updated_at, $like->pivot);
             }
@@ -203,6 +220,11 @@ class TopicController extends Controller
                     : $topic->user->updated_at->diffForHumans();
             }
 
+            // Add profile photo URL
+            $topic->user->profile_photo_url = $topic->user->profile_photo
+                ? asset('storage/' . $topic->user->profile_photo)
+                : null;
+
             unset($topic->user->created_at, $topic->user->updated_at);
         }
 
@@ -220,6 +242,13 @@ class TopicController extends Controller
                 $comment->updated_at_ago       = $comment->updated_at->diffInMinutes(now()) < 5
                     ? 'just now'
                     : $comment->updated_at->diffForHumans();
+            }
+
+            // Add profile photo URL for comment user
+            if ($comment->user) {
+                $comment->user->profile_photo_url = $comment->user->profile_photo
+                    ? asset('storage/' . $comment->user->profile_photo)
+                    : null;
             }
 
             unset($comment->created_at, $comment->updated_at);
@@ -240,6 +269,11 @@ class TopicController extends Controller
                     ? 'just now'
                     : $like->updated_at->diffForHumans();
             }
+
+            // Add profile photo URL for liked user
+            $like->profile_photo_url = $like->profile_photo
+                ? asset('storage/' . $like->profile_photo)
+                : null;
 
             unset($like->created_at, $like->updated_at, $like->pivot);
         }
@@ -346,6 +380,139 @@ class TopicController extends Controller
     }
 
     /**
+     * Display topics by category name
+     */
+    public function byCategory(Request $request, string $categoryName)
+    {
+        $category = TopicCategory::where('name', $categoryName)->first();
+
+        if (! $category) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Category not found',
+            ], 404);
+        }
+
+        $topics = Topic::with(['user', 'category:id,name', 'comments', 'likes'])
+            ->withCount(['comments', 'likes'])
+            ->where('topic_category_id', $category->id)
+            ->latest()
+            ->paginate(20);
+
+        $topics->getCollection()->transform(function ($topic) {
+            if ($topic->created_at) {
+                $topic->created_at_formatted = date('d M Y, H:i', strtotime($topic->created_at));
+                $topic->created_at_ago       = $topic->created_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $topic->created_at->diffForHumans();
+            }
+
+            if ($topic->updated_at) {
+                $topic->updated_at_formatted = date('d M Y, H:i', strtotime($topic->updated_at));
+                $topic->updated_at_ago       = $topic->updated_at->diffInMinutes(now()) < 5
+                    ? 'just now'
+                    : $topic->updated_at->diffForHumans();
+            }
+
+            unset($topic->created_at, $topic->updated_at);
+
+            if ($topic->user) {
+                if ($topic->user->created_at) {
+                    $topic->user->created_at_formatted = date('d M Y, H:i', strtotime($topic->user->created_at));
+                    $topic->user->created_at_ago       = $topic->user->created_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $topic->user->created_at->diffForHumans();
+                }
+
+                if ($topic->user->updated_at) {
+                    $topic->user->updated_at_formatted = date('d M Y, H:i', strtotime($topic->user->updated_at));
+                    $topic->user->updated_at_ago       = $topic->user->updated_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $topic->user->updated_at->diffForHumans();
+                }
+
+                $topic->user->profile_photo_url = $topic->user->profile_photo
+                    ? asset('storage/' . $topic->user->profile_photo)
+                    : null;
+
+                unset($topic->user->created_at, $topic->user->updated_at);
+            }
+
+            foreach ($topic->comments as $comment) {
+                if ($comment->created_at) {
+                    $comment->created_at_formatted = date('d M Y, H:i', strtotime($comment->created_at));
+                    $comment->created_at_ago       = $comment->created_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $comment->created_at->diffForHumans();
+                }
+
+                if ($comment->updated_at) {
+                    $comment->updated_at_formatted = date('d M Y, H:i', strtotime($comment->updated_at));
+                    $comment->updated_at_ago       = $comment->updated_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $comment->updated_at->diffForHumans();
+                }
+
+                if ($comment->user) {
+                    $comment->user->profile_photo_url = $comment->user->profile_photo
+                        ? asset('storage/' . $comment->user->profile_photo)
+                        : null;
+                }
+
+                unset($comment->created_at, $comment->updated_at);
+            }
+
+            foreach ($topic->likes as $like) {
+                if ($like->created_at) {
+                    $like->created_at_formatted = date('d M Y, H:i', strtotime($like->created_at));
+                    $like->created_at_ago       = $like->created_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $like->created_at->diffForHumans();
+                }
+
+                if ($like->updated_at) {
+                    $like->updated_at_formatted = date('d M Y, H:i', strtotime($like->updated_at));
+                    $like->updated_at_ago       = $like->updated_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $like->updated_at->diffForHumans();
+                }
+
+                $like->profile_photo_url = $like->profile_photo
+                    ? asset('storage/' . $like->profile_photo)
+                    : null;
+
+                unset($like->created_at, $like->updated_at, $like->pivot);
+            }
+
+            $topic->is_liked = $topic->likes->contains('id', auth()->id());
+
+            return $topic;
+        });
+
+        return response()->json([
+            'success'  => true,
+            'category' => $category->name,
+            'data'     => $topics,
+        ]);
+    }
+
+    /**
+     * Display all distinct categories that have at least one topic
+     */
+    public function categories()
+    {
+        $categories = TopicCategory::has('topics')
+            ->withCount('topics')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return response()->json([
+            'success' => true,
+            'data'    => $categories,
+        ]);
+    }
+
+    /**
      * Display trending topics (10 topics with most comments)
      */
     public function trending()
@@ -400,7 +567,36 @@ class TopicController extends Controller
                         : $topic->user->updated_at->diffForHumans();
                 }
 
+                // Add profile photo URL
+                $topic->user->profile_photo_url = $topic->user->profile_photo
+                    ? asset('storage/' . $topic->user->profile_photo)
+                    : null;
+
                 unset($topic->user->created_at, $topic->user->updated_at);
+            }
+
+            // Format timestamps untuk likes
+            foreach ($topic->likes as $like) {
+                if ($like->created_at) {
+                    $like->created_at_formatted = date('d M Y, H:i', strtotime($like->created_at));
+                    $like->created_at_ago       = $like->created_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $like->created_at->diffForHumans();
+                }
+
+                if ($like->updated_at) {
+                    $like->updated_at_formatted = date('d M Y, H:i', strtotime($like->updated_at));
+                    $like->updated_at_ago       = $like->updated_at->diffInMinutes(now()) < 5
+                        ? 'just now'
+                        : $like->updated_at->diffForHumans();
+                }
+
+                // Add profile photo URL for liked user
+                $like->profile_photo_url = $like->profile_photo
+                    ? asset('storage/' . $like->profile_photo)
+                    : null;
+
+                unset($like->created_at, $like->updated_at, $like->pivot);
             }
 
             // Check if authenticated user has liked this topic

@@ -46,6 +46,11 @@ class TopicCommentController extends Controller
             unset($comment->created_at, $comment->updated_at);
 
             if ($comment->user) {
+                // Add profile photo URL
+                $comment->user->profile_photo_url = $comment->user->profile_photo 
+                    ? asset('storage/' . $comment->user->profile_photo) 
+                    : null;
+                    
                 unset($comment->user->created_at, $comment->user->updated_at);
             }
 
@@ -92,6 +97,13 @@ class TopicCommentController extends Controller
 
         $comment->load('user');
 
+        // Add profile photo URL for user
+        if ($comment->user) {
+            $comment->user->profile_photo_url = $comment->user->profile_photo 
+                ? asset('storage/' . $comment->user->profile_photo) 
+                : null;
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Comment created successfully',
@@ -136,6 +148,13 @@ class TopicCommentController extends Controller
         $comment->body = $request->body;
         $comment->save();
         $comment->load('user');
+
+        // Add profile photo URL for user
+        if ($comment->user) {
+            $comment->user->profile_photo_url = $comment->user->profile_photo 
+                ? asset('storage/' . $comment->user->profile_photo) 
+                : null;
+        }
 
         return response()->json([
             'success' => true,

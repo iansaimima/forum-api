@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -48,6 +49,11 @@ class UserController extends Controller
             // Check if authenticated user is following this user
             $user->is_follow = auth()->user()->isFollowing($user->id);
 
+            // Add profile photo URL if exists
+            $user->profile_photo_url = $user->profile_photo
+                ? asset('storage/' . $user->profile_photo)
+                : null;
+
             unset($user->created_at, $user->updated_at);
             return $user;
         });
@@ -56,6 +62,38 @@ class UserController extends Controller
             'success' => true,
             'data'    => $users,
         ]);
+    }
+
+    public function myProfile()
+    {
+        $user    = auth()->user();
+        $user_id = $user->id;
+
+        return $this->show($user_id);
+    }
+
+    public function myFollowing()
+    {
+        $user    = auth()->user();
+        $user_id = $user->id;
+
+        return $this->following($user_id);
+    }
+
+    public function myFollowers()
+    {
+        $user    = auth()->user();
+        $user_id = $user->id;
+
+        return $this->followers($user_id);
+    }
+
+    public function myTopics()
+    {
+        $user    = auth()->user();
+        $user_id = $user->id;
+
+        return $this->topics($user_id);
     }
 
     /**
@@ -87,12 +125,19 @@ class UserController extends Controller
                 : $user->updated_at->diffForHumans();
         }
 
-        $data                 = $user->toArray();
+        $data              = $user->toArray();
         $data['is_follow'] = auth()->user()->isFollowing($id);
         unset($data['created_at'], $data['updated_at']);
 
         // tambahkan field is_you
         $data['is_you'] = auth()->id() == $user->id;
+
+        // tambahkan profile photo URL jika ada
+        if ($user->profile_photo) {
+            $data['profile_photo_url'] = asset('storage/' . $user->profile_photo);
+        } else {
+            $data['profile_photo_url'] = null;
+        }
 
         return response()->json([
             'success' => true,
@@ -212,6 +257,11 @@ class UserController extends Controller
             // Check if authenticated user is following this user
             $follower->is_follow = auth()->user()->isFollowing($follower->id);
 
+            // Add profile photo URL if exists
+            $follower->profile_photo_url = $follower->profile_photo
+                ? asset('storage/' . $follower->profile_photo)
+                : null;
+
             unset($follower->created_at, $follower->updated_at, $follower->pivot);
             return $follower;
         });
@@ -257,6 +307,11 @@ class UserController extends Controller
 
             // Check if authenticated user is following this user
             $user->is_follow = auth()->user()->isFollowing($user->id);
+
+            // Add profile photo URL if exists
+            $user->profile_photo_url = $user->profile_photo
+                ? asset('storage/' . $user->profile_photo)
+                : null;
 
             unset($user->created_at, $user->updated_at, $user->pivot);
             return $user;
@@ -323,6 +378,11 @@ class UserController extends Controller
                         : $topic->user->updated_at->diffForHumans();
                 }
 
+                // Add profile photo URL
+                $topic->user->profile_photo_url = $topic->user->profile_photo
+                    ? asset('storage/' . $topic->user->profile_photo)
+                    : null;
+
                 unset($topic->user->created_at, $topic->user->updated_at);
             }
 
@@ -361,6 +421,11 @@ class UserController extends Controller
                         : $like->updated_at->diffForHumans();
                 }
 
+                // Add profile photo URL for liked user
+                $like->profile_photo_url = $like->profile_photo
+                    ? asset('storage/' . $like->profile_photo)
+                    : null;
+
                 unset($like->created_at, $like->updated_at, $like->pivot);
             }
 
@@ -373,6 +438,45 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'data'    => $topics,
+        ]);
+    }
+
+    /**
+     * Upload profile photo
+     */
+    public function uploadProfilePhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // max 2MB
+        ]);
+
+        $user = auth()->user();
+
+        // Delete old photo if exists
+        if ($user->profile_photo) {
+            Storage::disk('public')->delete($user->profile_photo);
+        }
+
+        // Get file extension
+        $extension = $request->file('photo')->getClientOriginalExtension();
+
+        // Create filename: [username].[extension]
+        $filename = $user->username . '.' . $extension;
+
+        // Store new photo with custom filename
+        $path = $request->file('photo')->storeAs('profile_photos', $filename, 'public');
+
+        // Update user profile
+        $user->profile_photo = $path;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile photo uploaded successfully',
+            'data'    => [
+                'profile_photo'     => $path,
+                'profile_photo_url' => asset('storage/' . $path),
+            ],
         ]);
     }
 }

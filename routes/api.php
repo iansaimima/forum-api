@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\Api\TopicCommentController;
+use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\Api\TopicLikeController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +23,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('topics')->group(function () {
         Route::get('/', [TopicController::class, 'index']);
         Route::get('/trending', [TopicController::class, 'trending']);
+        Route::get('/categories', [TopicController::class, 'categories']);
+        Route::get('/category/{categoryName}', [TopicController::class, 'byCategory']);
         Route::post('/', [TopicController::class, 'store']);
         Route::put('/{id}', [TopicController::class, 'update']);
         Route::delete('/{id}', [TopicController::class, 'destroy']);
@@ -41,6 +43,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Users
     Route::prefix('users')->group(function () {
+        // user login info
+        Route::get('/profile', [UserController::class, 'myProfile']);
+        Route::get('/profile-following', [UserController::class, 'myFollowing']);
+        Route::get('/profile-followers', [UserController::class, 'myFollowers']);
+        Route::get('/profile-topics', [UserController::class, 'myTopics']);
+        Route::post('/profile-photo', [UserController::class, 'uploadProfilePhoto']);
+
+        // other user info
         Route::get('/search', [UserController::class, 'search']);
         Route::get('/{id}', [UserController::class, 'show']);
         Route::post('/{id}/follow', [UserController::class, 'follow']);
