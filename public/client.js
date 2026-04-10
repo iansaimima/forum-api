@@ -77,6 +77,8 @@ function deleteRequest(endpoint, token = null) {
     });
 }
 
+// upload 
+
 // Export functions (if using modules)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { get, post, put, deleteRequest };

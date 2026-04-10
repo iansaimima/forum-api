@@ -24,7 +24,7 @@ class TopicCommentController extends Controller
         }
 
         $comments = TopicComment::where('topic_id', $topicId)
-            ->with('user:id,name,email,username')
+            ->with('user:id,name,email,username,profile_photo')
             ->latest()
             ->paginate(20);
 
