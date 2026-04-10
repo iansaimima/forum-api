@@ -81,3 +81,5 @@ function deleteRequest(endpoint, token = null) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { get, post, put, deleteRequest };
 }
+
+

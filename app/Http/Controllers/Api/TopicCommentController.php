@@ -43,16 +43,14 @@ class TopicCommentController extends Controller
                 $comment->updated_at_formatted = date('d M Y, H:i', strtotime($comment->updated_at));
             }
 
-            unset($comment->created_at, $comment->updated_at);
-
+            
+            // Add profile photo URL for comment user
             if ($comment->user) {
-                // Add profile photo URL
-                $comment->user->profile_photo_url = $comment->user->profile_photo 
-                    ? asset('storage/' . $comment->user->profile_photo) 
-                    : null;
-                    
-                unset($comment->user->created_at, $comment->user->updated_at);
+                $comment->user->profile_photo_url = $comment->user->profile_photo
+                ? asset('storage/' . $comment->user->profile_photo)
+                : null;
             }
+            unset($comment->created_at, $comment->updated_at);
 
             return $comment;
         });
