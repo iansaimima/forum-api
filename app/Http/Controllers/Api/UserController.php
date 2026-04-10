@@ -48,6 +48,8 @@ class UserController extends Controller
 
             // Check if authenticated user is following this user
             $user->is_follow = auth()->user()->isFollowing($user->id);
+            $user->is_you = auth()->user()->id = $user->id;
+            
 
             // Add profile photo URL if exists
             $user->profile_photo_url = $user->profile_photo
