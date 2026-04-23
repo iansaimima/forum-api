@@ -94,6 +94,12 @@ class AuthController extends Controller
         $userData = $user->toArray();
         unset($userData['created_at'], $userData['updated_at']);
 
+        // Ganti profile_photo (raw path) dengan profile_photo_url (full URL)
+        $userData['profile_photo_url'] = $user->profile_photo
+            ? asset('storage/' . $user->profile_photo)
+            : null;
+        unset($userData['profile_photo']);
+
         return response()->json([
             'success' => true,
             'message' => 'User registered successfully',

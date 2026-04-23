@@ -318,17 +318,23 @@
                         <p class="description">Register a new user account</p>
 
                         <div class="api-section">
+                            <h4>Content-Type:</h4>
+                            <div class="code-block">
+                                <pre>multipart/form-data</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
                             <h4>Request Body:</h4>
                             <div class="code-block">
-                                <pre>{
-  "name": "John Doe",
-  "username": "johndoe",
-  "email": "john@example.com",
-  "password": "password123",
-  "password_confirmation": "password123",
-  "phone": "+6281234567890",
-  "address": "Jakarta, Indonesia"
-}</pre>
+                                <pre>name             = "John Doe"          (required)
+username         = "johndoe"           (required, unique)
+email            = "john@example.com"  (required, unique)
+password         = "password123"       (required, min:8)
+password_confirmation = "password123" (required)
+phone            = "+6281234567890"    (optional)
+address          = "Jakarta, Indonesia" (optional)
+profile_photo    = &lt;file&gt;              (optional, image: jpg/jpeg/png/webp, max 2MB)</pre>
                             </div>
                         </div>
 
@@ -336,6 +342,10 @@
                             <h4>📌 Note</h4>
                             <ul>
                                 <li><code>phone</code> and <code>address</code> are optional fields</li>
+                                <li><code>profile_photo</code> is optional — user can also upload it later via <code>PUT /users/profile</code></li>
+                                <li>Request must be sent as <code>multipart/form-data</code> (not JSON) to support file upload</li>
+                                <li>Accepted image formats: <code>jpg</code>, <code>jpeg</code>, <code>png</code>, <code>webp</code> — max <strong>2MB</strong></li>
+                                <li>If registration fails after upload, the photo is automatically deleted</li>
                             </ul>
                         </div>
 
@@ -352,9 +362,9 @@
       "username": "johndoe",
       "email": "john@example.com",
       "emailVerifiedAt": null,
-      "profilePhoto": null,
-      "phone": null,
-      "address": null,
+      "profilePhotoUrl": "https://domain.com/storage/profile_photos/abc123.jpg",
+      "phone": "+6281234567890",
+      "address": "Jakarta, Indonesia",
       "createdAtFormatted": "26 Mar 2026, 10:00",
       "createdAtAgo": "just now",
       "updatedAtFormatted": "26 Mar 2026, 10:00",
@@ -375,14 +385,26 @@
   "message": "Registration validation failed",
   "errors": {
     "email": ["The email has already been taken."],
-    "username": ["The username has already been taken."]
+    "username": ["The username has already been taken."],
+    "profile_photo": ["Profile photo must not be larger than 2MB."]
   }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="api-section">
+                            <h4>Response (200) - Registration Failed (Server Error):</h4>
+                            <div class="code-block">
+                                <pre>{
+  "success": false,
+  "message": "Registration failed. Please try again."
 }</pre>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
 
             <div class="accordion">
                 <div class="accordion-header" onclick="toggleAccordion(this)">
