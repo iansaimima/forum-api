@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -17,19 +18,23 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'     => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users',
-            'email'    => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'phone'    => 'nullable|string|max:20',
-            'address'  => 'nullable|string',
+            'name'          => 'required|string|max:255',
+            'username'      => 'required|string|max:255|unique:users',
+            'email'         => 'required|string|email|max:255|unique:users',
+            'password'      => 'required|string|min:8|confirmed',
+            'phone'         => 'nullable|string|max:20',
+            'address'       => 'nullable|string',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
-            'name.required'     => 'Name is required.',
-            'username.required' => 'Username is required.',
-            'username.unique'   => 'The username has already been taken.',
-            'email.required'    => 'Email is required.',
-            'email.unique'      => 'The email has already been taken.',
-            'password.required' => 'Password is required.',
+            'name.required'          => 'Name is required.',
+            'username.required'      => 'Username is required.',
+            'username.unique'        => 'The username has already been taken.',
+            'email.required'         => 'Email is required.',
+            'email.unique'           => 'The email has already been taken.',
+            'password.required'      => 'Password is required.',
+            'profile_photo.image'    => 'Profile photo must be an image.',
+            'profile_photo.mimes'    => 'Profile photo must be a JPG, JPEG, PNG, or WEBP file.',
+            'profile_photo.max'      => 'Profile photo must not be larger than 2MB.',
         ]);
 
         if ($validator->fails()) {
@@ -41,16 +46,35 @@ class AuthController extends Controller
         }
         $validated = $validator->validated();
 
-        $user = User::create([
-            'name'     => $validated['name'],
-            'username' => $validated['username'],
-            'email'    => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'phone'    => $validated['phone'] ?? null,
-            'address'  => $validated['address'] ?? null,
-        ]);
+        // Handle optional profile photo upload
+        $profilePhotoPath = null;
+        if ($request->hasFile('profile_photo')) {
+            $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
+        }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        try {
+            $user = User::create([
+                'name'          => $validated['name'],
+                'username'      => $validated['username'],
+                'email'         => $validated['email'],
+                'password'      => Hash::make($validated['password']),
+                'phone'         => $validated['phone'] ?? null,
+                'address'       => $validated['address'] ?? null,
+                'profile_photo' => $profilePhotoPath,
+            ]);
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+        } catch (\Exception $e) {
+            // Hapus foto yang sudah terupload jika registrasi gagal
+            if ($profilePhotoPath) {
+                Storage::disk('public')->delete($profilePhotoPath);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Registration failed. Please try again.',
+            ], 200);
+        }
 
         // Format timestamps
         if ($user->created_at) {

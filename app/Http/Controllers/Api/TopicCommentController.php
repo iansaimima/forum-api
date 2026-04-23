@@ -43,7 +43,7 @@ class TopicCommentController extends Controller
                 $comment->updated_at_formatted = date('d M Y, H:i', strtotime($comment->updated_at));
             }
 
-            
+
             // Add profile photo URL for comment user
             if ($comment->user) {
                 $comment->user->profile_photo_url = $comment->user->profile_photo
@@ -97,8 +97,8 @@ class TopicCommentController extends Controller
 
         // Add profile photo URL for user
         if ($comment->user) {
-            $comment->user->profile_photo_url = $comment->user->profile_photo 
-                ? asset('storage/' . $comment->user->profile_photo) 
+            $comment->user->profile_photo_url = $comment->user->profile_photo
+                ? asset('storage/' . $comment->user->profile_photo)
                 : null;
         }
 
@@ -149,8 +149,8 @@ class TopicCommentController extends Controller
 
         // Add profile photo URL for user
         if ($comment->user) {
-            $comment->user->profile_photo_url = $comment->user->profile_photo 
-                ? asset('storage/' . $comment->user->profile_photo) 
+            $comment->user->profile_photo_url = $comment->user->profile_photo
+                ? asset('storage/' . $comment->user->profile_photo)
                 : null;
         }
 

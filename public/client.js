@@ -77,11 +77,28 @@ function deleteRequest(endpoint, token = null) {
     });
 }
 
-// upload 
+/**
+ * Upload file(s)
+ * @param {string} endpoint - API endpoint
+ * @param {FormData} formData - FormData object containing file(s) and other data
+ * @param {string} token - Authorization token (optional)
+ * @returns {Promise}
+ */
+function postUpload(endpoint, formData, token = null) {
+    return $.ajax({
+        url: `${API_BASE_URL}${endpoint}`,
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        dataType: 'json'
+    });
+}
 
 // Export functions (if using modules)
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { get, post, put, deleteRequest };
+    module.exports = { get, post, put, deleteRequest, postUpload };
 }
 
 
