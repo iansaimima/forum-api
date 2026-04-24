@@ -28,7 +28,7 @@ class UserController extends Controller
                 ->orWhere('name', 'like', "%{$query}%");
         })
             ->where('id', '!=', auth()->id()) // Exclude current user
-            ->select('id', 'name', 'username', 'email', 'created_at', 'updated_at')
+            ->select('id', 'name', 'username', 'email', 'profile_photo', 'created_at', 'updated_at')
             ->paginate(20);
 
         $users->getCollection()->transform(function ($user) {
@@ -238,7 +238,7 @@ class UserController extends Controller
         }
 
         $followers = $user->followers()
-            ->select('users.id', 'users.name', 'users.username', 'users.email', 'users.created_at', 'users.updated_at')
+            ->select('users.id', 'users.name', 'users.username', 'users.email', 'users.profile_photo', 'users.created_at', 'users.updated_at')
             ->paginate(20);
 
         $followers->getCollection()->transform(function ($follower) {
@@ -289,7 +289,7 @@ class UserController extends Controller
         }
 
         $following = $user->following()
-            ->select('users.id', 'users.name', 'users.username', 'users.email', 'users.created_at', 'users.updated_at')
+            ->select('users.id', 'users.name', 'users.username', 'users.email', 'users.profile_photo', 'users.created_at', 'users.updated_at')
             ->paginate(20);
 
         $following->getCollection()->transform(function ($user) {

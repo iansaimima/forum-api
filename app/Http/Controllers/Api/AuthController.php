@@ -18,30 +18,30 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'          => 'required|string|max:255',
-            'username'      => 'required|string|max:255|unique:users',
-            'email'         => 'required|string|email|max:255|unique:users',
-            'password'      => 'required|string|min:8|confirmed',
-            'phone'         => 'nullable|string|max:20',
-            'address'       => 'nullable|string',
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
             'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
-            'name.required'          => 'Name is required.',
-            'username.required'      => 'Username is required.',
-            'username.unique'        => 'The username has already been taken.',
-            'email.required'         => 'Email is required.',
-            'email.unique'           => 'The email has already been taken.',
-            'password.required'      => 'Password is required.',
-            'profile_photo.image'    => 'Profile photo must be an image.',
-            'profile_photo.mimes'    => 'Profile photo must be a JPG, JPEG, PNG, or WEBP file.',
-            'profile_photo.max'      => 'Profile photo must not be larger than 2MB.',
+            'name.required' => 'Name is required.',
+            'username.required' => 'Username is required.',
+            'username.unique' => 'The username has already been taken.',
+            'email.required' => 'Email is required.',
+            'email.unique' => 'The email has already been taken.',
+            'password.required' => 'Password is required.',
+            'profile_photo.image' => 'Profile photo must be an image.',
+            'profile_photo.mimes' => 'Profile photo must be a JPG, JPEG, PNG, or WEBP file.',
+            'profile_photo.max' => 'Profile photo must not be larger than 2MB.',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Registration validation failed',
-                'errors'  => $validator->errors(),
+                'errors' => $validator->errors(),
             ], 200); // Custom status code 200
         }
         $validated = $validator->validated();
@@ -54,12 +54,12 @@ class AuthController extends Controller
 
         try {
             $user = User::create([
-                'name'          => $validated['name'],
-                'username'      => $validated['username'],
-                'email'         => $validated['email'],
-                'password'      => Hash::make($validated['password']),
-                'phone'         => $validated['phone'] ?? null,
-                'address'       => $validated['address'] ?? null,
+                'name' => $validated['name'],
+                'username' => $validated['username'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'phone' => $validated['phone'] ?? null,
+                'address' => $validated['address'] ?? null,
                 'profile_photo' => $profilePhotoPath,
             ]);
 
@@ -103,10 +103,10 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'User registered successfully',
-            'data'    => [
-                'user'         => $userData,
+            'data' => [
+                'user' => $userData,
                 'access_token' => $token,
-                'token_type'   => 'Bearer',
+                'token_type' => 'Bearer',
             ],
         ], 201);
     }
@@ -118,11 +118,11 @@ class AuthController extends Controller
     {
         // Cara 2: Validation dengan custom status code menggunakan Validator facade
         $validator = Validator::make($request->all(), [
-            'email'    => 'required|email',
+            'email' => 'required|email',
             'password' => 'required',
         ], [
-            'email.required'    => 'Email is required',
-            'email.email'       => 'Email must be a valid email address',
+            'email.required' => 'Email is required',
+            'email.email' => 'Email must be a valid email address',
             'password.required' => 'Password is required',
         ]);
 
@@ -130,19 +130,19 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Login validation failed',
-                'errors'  => $validator->errors(),
+                'errors' => $validator->errors(),
             ], 200); // Custom status code 200
         }
 
         $user = User::where('email', $request->email)->first();
-        if (! $user) {
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'User not found with this email.',
             ], 200); // Custom status code 200
         }
 
-        if (! Hash::check($request->password, $user->password)) {
+        if (!Hash::check($request->password, $user->password)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Incorrect password.',
@@ -172,10 +172,10 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
-            'data'    => [
-                'user'         => $userData,
+            'data' => [
+                'user' => $userData,
                 'access_token' => $token,
-                'token_type'   => 'Bearer',
+                'token_type' => 'Bearer',
             ],
         ]);
     }
@@ -206,14 +206,14 @@ class AuthController extends Controller
             'email' => 'required|email|exists:users,email',
         ], [
             'email.required' => 'Email is required',
-            'email.email'    => 'Email must be a valid email address',
-            'email.exists'   => 'No user found with this email address',
+            'email.email' => 'Email must be a valid email address',
+            'email.exists' => 'No user found with this email address',
         ]);
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Forgot password validation failed',
-                'errors'  => $validator->errors(),
+                'errors' => $validator->errors(),
             ], 200); // Custom status code 200
         }
 
@@ -240,8 +240,8 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'token'    => 'required',
-            'email'    => 'required|email',
+            'token' => 'required',
+            'email' => 'required|email',
             'password' => 'required|min:8|confirmed',
         ]);
 

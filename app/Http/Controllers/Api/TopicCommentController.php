@@ -47,8 +47,8 @@ class TopicCommentController extends Controller
             // Add profile photo URL for comment user
             if ($comment->user) {
                 $comment->user->profile_photo_url = $comment->user->profile_photo
-                ? asset('storage/' . $comment->user->profile_photo)
-                : null;
+                    ? asset('storage/' . $comment->user->profile_photo)
+                    : null;
             }
             unset($comment->created_at, $comment->updated_at);
 
